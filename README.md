@@ -1,235 +1,256 @@
-# HomeLab SOC & Security Testing Environment
+<div align="center">
+  <h1>HomeLab SOC & Security Testing Environment</h1>
+  <p><strong>An isolated VirtualBox lab for network segmentation, controlled attack simulation, and Splunk-backed detection engineering.</strong></p>
+  <p>
+    <a href="#overview">Overview</a> •
+    <a href="#architecture">Architecture</a> •
+    <a href="#visual-walkthrough">Visual Walkthrough</a> •
+    <a href="#tools-and-exercises">Tools & Exercises</a> •
+    <a href="#bring-up-sequence">Bring-Up</a>
+  </p>
+  <p>
+    <img src="https://img.shields.io/badge/Virtualization-VirtualBox-183A61?style=flat-square" alt="VirtualBox badge" />
+    <img src="https://img.shields.io/badge/Firewall-pfSense-2A2A2A?style=flat-square" alt="pfSense badge" />
+    <img src="https://img.shields.io/badge/SIEM-Splunk-65A637?style=flat-square" alt="Splunk badge" />
+    <img src="https://img.shields.io/badge/Focus-Detection%20%26%20Containment-0B6E4F?style=flat-square" alt="Detection and containment badge" />
+  </p>
+</div>
 
-This project documents a self-contained cyber security home lab built to safely practice network defense, vulnerability assessment, traffic analysis, and SIEM monitoring. The lab was designed to stay isolated from the host machine and wider home network while still allowing controlled internet access when required.
+<p align="center">
+  <img src="assets/branding/homelab-banner.svg" alt="HomeLab SOC banner" width="100%" />
+</p>
 
-The environment uses VirtualBox networking, `pfSense` for segmentation and traffic control, multiple VLAN-style lab segments, and `Splunk` for centralized log collection. Within that environment, I practiced host discovery, service enumeration, vulnerability scanning, credential attack detection, packet analysis, and log correlation.
+<p align="center">
+  <img src="assets/screenshots/splunk-dashboard.jpeg" alt="Splunk SOC monitoring dashboard" width="92%" />
+</p>
 
-## Objectives
+> A blue-team-focused home lab where all systems sit behind `pfSense`, vulnerable workloads stay contained, and security activity can be searched, graphed, and investigated in `Splunk`.
 
-- Keep the lab isolated from the host and home network.
-- Simulate segmented enterprise-style networking.
-- Route traffic through `pfSense` for visibility and control.
-- Generate realistic logs for SIEM-style analysis in `Splunk`.
-- Practice offensive tooling in a contained environment to better understand detection opportunities.
+## Overview
 
-## Lab Architecture
+This lab was built to safely practice security operations in an environment that feels closer to a real network than a flat collection of virtual machines. The design centers on isolation, segmentation, and visibility: VirtualBox provides the virtualization layer, `pfSense` controls routing and security policy, and `Splunk` acts as the central point for log collection and analysis.
 
-- `VirtualBox Host-Only` networking was used to keep the lab separated from the host machine and main network.
-- `VirtualBox NAT` provided controlled outbound internet access through `pfSense` when needed.
-- `pfSense` acted as the central firewall and gateway for all lab segments.
-- VLAN-style segmentation was used to separate lab systems into different trust zones such as:
-  - Lab segment
-  - Workstation segment
-  - Server segment
+Inside the lab, I used tools such as `Nmap`, `OpenVAS`, `Metasploit`, `Hydra`, `Burp Suite`, `Wireshark`, `John the Ripper`, and `Scapy` to generate controlled test activity and study how that activity looked from a defensive point of view.
 
-All virtual machines, including Windows, Kali, Metasploitable2, and Splunk, lived behind `pfSense` on internal LAN segments. The WAN side of `pfSense` connected to VirtualBox NAT so the lab could reach the internet in a controlled way without exposing vulnerable machines directly.
+### Why This Project Stands Out
+
+- Segmented the lab into dedicated `LAN`, `SERVER_NET`, and `WORKSTATION_NET` zones behind a central firewall
+- Routed telemetry from `pfSense` into `Splunk` to simulate a small SOC monitoring workflow
+- Validated the environment with real scans, connectivity checks, and log review instead of static screenshots alone
+- Practiced both offensive tooling and defensive interpretation inside a contained environment
+
+## Lab Snapshot
+
+| Area | Details |
+| --- | --- |
+| Primary goal | Build an isolated lab for security testing and SOC-style monitoring |
+| Edge connectivity | `VirtualBox NAT` -> `pfSense WAN` |
+| Segmentation model | Dedicated internal networks behind `pfSense` to simulate VLAN-style segmentation |
+| Internal networks | `LAN 192.168.10.0/24`, `SERVER_NET 192.168.20.0/24`, `WORKSTATION_NET 192.168.30.0/24` |
+| Core services | `pfSense`, `Splunk`, `Kali Linux`, `Windows Server 2022`, `Metasploitable2` |
+| Telemetry path | `pfSense` syslog forwarded into `Splunk` over `UDP/1514` |
+| Validation traffic | ICMP tests, `Nmap` scans, web traffic, service discovery, and firewall log review |
+
+## Architecture
 
 ```mermaid
 flowchart LR
-    H["Host Machine"] --> VB["VirtualBox"]
+    HOST["Host Machine"] --> VB["VirtualBox"]
     VB --> NAT["VirtualBox NAT"]
     NAT --> WAN["pfSense WAN"]
-    WAN --> FW["pfSense Firewall / Router"]
-    FW --> LAB["Lab Segment"]
-    FW --> WS["Workstation Segment"]
-    FW --> SRV["Server Segment"]
-    LAB --> KALI["Kali Linux"]
-    WS --> WIN["Windows Server 2022"]
+    WAN --> PF["pfSense Firewall / Router"]
+
+    PF --> LAN["LAN 192.168.10.0/24"]
+    PF --> SRV["SERVER_NET 192.168.20.0/24"]
+    PF --> WS["WORKSTATION_NET 192.168.30.0/24"]
+
+    LAN --> KALI["Kali Linux"]
     SRV --> META["Metasploitable2"]
-    FW --> SPLUNK["Splunk Server"]
-    SPLUNK -. log collection .-> LAB
-    SPLUNK -. log collection .-> WS
-    SPLUNK -. log collection .-> SRV
+    SRV --> SPLUNK["Ubuntu Splunk Server"]
+    WS --> WIN["Windows Server 2022"]
+
+    PF -. syslog .-> SPLUNK
 ```
 
-## Core Security Controls
+## Segmentation and Controls
 
-`pfSense` was used for network segmentation, controlled internet access, and as a realistic security telemetry source for the lab.
+| Control | Implementation | Why it matters |
+| --- | --- | --- |
+| Host isolation | VirtualBox internal networks plus a NAT-backed WAN | Keeps the lab separated from the host and home network |
+| Central gateway | `pfSense` is the only path between networks and the internet | Makes traffic visible and policy-driven |
+| Internal segmentation | Separate interfaces for `LAN`, `SERVER_NET`, and `WORKSTATION_NET` | Simulates trust boundaries and limits unrestricted east-west traffic |
+| DHCP and ICMP | Enabled where needed for address assignment and troubleshooting | Speeds up validation and recovery |
+| Log collection | `pfSense` events forwarded to `Splunk` | Creates a SOC-style data source for searches and dashboards |
+| Vulnerable host containment | Intentionally vulnerable systems remain behind `pfSense` | Supports safe offensive testing inside the lab |
 
-Key rules and behaviors included:
+## Visual Walkthrough
 
-- Allowing `DHCP` traffic so `pfSense` could assign IP addresses to lab systems.
-- Allowing internal `ICMP` ping for connectivity checks and troubleshooting.
-- Allowing `Splunk` to reach hosts across segments for centralized log collection.
-- Allowing outbound internet access only when necessary for updates or testing.
-- Blocking `Metasploitable2` from reaching the internet so intentionally vulnerable services stayed contained.
+<table>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/virtualbox-overview.jpeg" alt="VirtualBox overview" width="100%" />
+      <br />
+      <sub>VirtualBox running the core lab machines</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/pfsense-cli-interfaces.jpeg" alt="pfSense CLI interface overview" width="100%" />
+      <br />
+      <sub>pfSense interface map and IP assignments</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/pfsense-interface-assignments.jpeg" alt="pfSense interface assignments" width="100%" />
+      <br />
+      <sub>Interface-based segmentation inside pfSense</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/pfsense-dhcp-lan.jpeg" alt="pfSense DHCP configuration" width="100%" />
+      <br />
+      <sub>DHCP services used to provision internal hosts</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/pfsense-firewall-logs.jpeg" alt="pfSense firewall logs" width="100%" />
+      <br />
+      <sub>Firewall events captured at the gateway</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/splunk-dashboard.jpeg" alt="Splunk dashboard" width="100%" />
+      <br />
+      <sub>Splunk dashboard built from ingested lab telemetry</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/splunk-data-inputs.jpeg" alt="Splunk data inputs" width="100%" />
+      <br />
+      <sub>Syslog listener configured on UDP/1514</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/splunk-raw-logs.jpeg" alt="Splunk raw log search" width="100%" />
+      <br />
+      <sub>Raw searchable events from pfSense in Splunk</sub>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/kali-nmap-scans.jpeg" alt="Kali running nmap scans" width="100%" />
+      <br />
+      <sub>Kali generating controlled scan traffic inside the lab</sub>
+    </td>
+    <td align="center" width="50%">
+      <img src="assets/screenshots/kali-connectivity-check.jpeg" alt="Kali connectivity checks" width="100%" />
+      <br />
+      <sub>Connectivity validation between permitted systems</sub>
+    </td>
+  </tr>
+</table>
 
-This design allowed me to observe both permitted and blocked traffic in firewall logs while keeping the environment safe.
+<details>
+  <summary><strong>Additional configuration screenshots</strong></summary>
+  <br />
+  <table>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-adapter1-nat.jpeg" alt="pfSense adapter 1 NAT" width="100%" />
+        <br />
+        <sub>WAN adapter attached to VirtualBox NAT</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-adapter2-lab.jpeg" alt="pfSense adapter 2 LAN" width="100%" />
+        <br />
+        <sub>Internal LAN adapter</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-adapter3-server.jpeg" alt="pfSense adapter 3 server network" width="100%" />
+        <br />
+        <sub>SERVER_NET adapter</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-adapter4-workstation.jpeg" alt="pfSense adapter 4 workstation network" width="100%" />
+        <br />
+        <sub>WORKSTATION_NET adapter</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-rule-server-net.jpeg" alt="pfSense server network rule" width="100%" />
+        <br />
+        <sub>Representative pfSense rule configuration for SERVER_NET</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-rule-workstation-net.jpeg" alt="pfSense workstation network rule" width="100%" />
+        <br />
+        <sub>Representative pfSense rule configuration for WORKSTATION_NET</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-arp-table.jpeg" alt="pfSense ARP table" width="100%" />
+        <br />
+        <sub>ARP visibility across active interfaces and hosts</sub>
+      </td>
+      <td align="center" width="50%">
+        <img src="assets/screenshots/pfsense-traffic-graph.jpeg" alt="pfSense traffic graph spike during scans" width="100%" />
+        <br />
+        <sub>Traffic spike observed during `Nmap` testing</sub>
+      </td>
+    </tr>
+  </table>
+</details>
 
-## Systems in the Lab
+## Detection Workflow
 
-- `pfSense` firewall/router
-- `Splunk` for log collection and SIEM-style visibility
-- `Kali Linux` for security testing
-- `Windows Server 2022`
-- `Metasploitable2`
-- Additional Linux hosts for scanning and validation
+1. Test traffic originates from lab systems such as `Kali`, Windows, or intentionally vulnerable targets.
+2. `pfSense` routes, filters, and logs that activity at the network boundary between segments.
+3. `pfSense` forwards syslog data into `Splunk` on `UDP/1514`.
+4. `Splunk` provides both a dashboard view and raw event search for analysis and correlation.
+5. Packet-level and endpoint-level observations can be compared against firewall and SIEM telemetry.
 
-## Tooling and What I Practiced
+## Tools and Exercises
 
-### Splunk
+| Tool | How it was used | What I learned |
+| --- | --- | --- |
+| `Nmap` | Host discovery, service enumeration, SYN scans, and OS detection | How active scanning appears in firewall logs and packet captures |
+| `OpenVAS / Greenbone` | Authenticated and unauthenticated vulnerability scans against lab systems | How to interpret service exposure, CVSS scores, and vulnerability prioritization |
+| `Metasploit` | Controlled exploitation and service checks against intentionally vulnerable hosts | How exploit activity and service misuse can create detectable signals |
+| `Hydra` | Credential testing across protocols such as `SSH`, `FTP`, `SMB`, `RDP`, and HTTP forms | How repeated login attempts show up in endpoint and SIEM telemetry |
+| `Burp Suite` | Web interception, request replay, input testing, and response comparison | How suspicious web traffic and form abuse can be observed and reasoned about |
+| `Wireshark` | Packet capture for `SYN`, `DNS`, `HTTP`, `SMB`, and authentication traffic | How logs and packets complement each other during investigations |
+| `John the Ripper` | Offline password cracking and hash analysis | Why offline attacks are often invisible on the network and depend on prior credential exposure |
+| `Scapy` | Custom packet crafting and ARP-based discovery | How low-level traffic can be used to build asset inventories and test assumptions |
 
-I used `Splunk` to collect logs from endpoints and infrastructure so I could simulate SIEM workflows. The goal was to observe how scans, login attempts, firewall activity, and web testing appeared across different data sources.
+## Bring-Up Sequence
 
-Examples of telemetry I reviewed:
+1. Start `pfSense` first so routing, DHCP, and firewall policy are available.
+2. Start `Splunk` so logs are collected from the beginning of the session.
+3. Start target systems such as `Windows Server 2022` and `Metasploitable2`.
+4. Start `Kali Linux` and run connectivity checks before any scanning or testing.
+5. Confirm DHCP leases, successful ICMP where allowed, and live event ingestion in `Splunk`.
 
-- Firewall events from `pfSense`
-- Authentication activity from Windows systems
-- Scan-related traffic
-- Web request patterns
-- Credential attack attempts
+## Repository Structure
 
-### pfSense
+```text
+.
+├── GITHUB_COPY.md
+├── README.md
+└── assets
+    ├── branding
+    └── screenshots
+```
 
-`pfSense` was the foundation of the lab. It provided:
+## Key Outcomes
 
-- Network segmentation
-- A controlled path to the internet
-- Containment for vulnerable virtual machines
-- Firewall logs that served as a SOC-relevant data source
-
-I used it to observe blocked scans, ICMP traffic, and cross-segment communication.
-
-### Nmap
-
-I used `Nmap` for host discovery, service discovery, and controlled scan activity inside the lab. This helped me map the environment, identify exposed services, and compare what I saw from the scanner with what `pfSense`, `Splunk`, and `Wireshark` recorded.
-
-Concepts practiced:
-
-- Host discovery
-- Service enumeration
-- SYN scanning
-- OS fingerprinting
-- Scan visibility in firewall and packet-capture tools
-
-### OpenVAS / Greenbone
-
-I used `OpenVAS` to perform vulnerability assessments against lab systems.
-
-Use cases included:
-
-- Unauthenticated scans against `Metasploitable2`
-- Authenticated scanning against `Windows Server 2022`
-- Reviewing vulnerability severity through `CVSS` scoring and risk metrics
-- Exporting vulnerability results into `Splunk` for correlation
-
-Findings from `Metasploitable2` included exposed and outdated services such as:
-
-- `OpenSSH`
-- Outdated `Apache`
-- Vulnerable `Tomcat`
-
-This helped me better understand how outdated services expand attack surface and how vulnerability scan results can be prioritized.
-
-### Metasploit
-
-I used `Metasploit` inside the isolated lab to understand how vulnerable services can be identified and how exploit activity generates security telemetry.
-
-Lab exercises included:
-
-- Testing known vulnerable FTP services
-- Checking HTTP service versions
-- Assessing weak or default web application credentials
-- Comparing SMB exposure between modern Windows systems and intentionally vulnerable hosts
-
-The focus was not only exploitation, but also understanding what those actions looked like from a defender's perspective in logs and network traces.
-
-### Hydra
-
-I used `Hydra` to study weak credential exposure and brute-force detection across several protocols.
-
-Protocols explored:
-
-- `SSH`
-- `FTP`
-- `SMB`
-- `RDP`
-- HTTP form authentication
-
-This helped me understand:
-
-- The difference between single-user and multi-user password testing
-- The impact of thread count on attack speed
-- How repeated login attempts appear in endpoint and SIEM logs
-- Why account lockout and monitoring matter
-
-### Burp Suite
-
-I used `Burp Suite` to test web applications hosted in the lab.
-
-Areas practiced:
-
-- Intercepting and modifying HTTP/S requests
-- Replaying requests in `Repeater`
-- Fuzzing parameters and login inputs
-- Observing differences in server responses such as `200`, `403`, and `500`
-- Studying how login attempts and malformed requests appeared in `Splunk`
-
-This helped me better understand input validation issues, web request flows, and detection opportunities around suspicious web traffic.
-
-### Wireshark
-
-I used `Wireshark` to capture and inspect live packet traffic generated by my lab tools.
-
-Traffic analyzed included:
-
-- `Nmap` SYN scan behavior
-- HTTP `POST` requests from a demo login page
-- `DNS` queries generated by scripts
-- `SMB` and `NTLM` authentication traffic from Windows testing
-
-This gave me packet-level visibility into how scans, authentication attempts, and application traffic actually moved through the network.
-
-### John the Ripper
-
-I used `John the Ripper` to study password security and offline hash cracking.
-
-Concepts practiced:
-
-- Password hash analysis
-- Cracking `NTLM` hashes
-- Working with password material from vulnerable Linux systems
-- Understanding the difference between online attacks and offline cracking
-
-One key lesson was that offline cracking does not generate the same network visibility as online attacks. Detection depends much more on preventing, monitoring, and responding to credential or hash leakage upstream.
-
-### Scapy
-
-I used `Scapy` to build custom packet workflows, especially for host discovery using `ARP`.
-
-This was useful because:
-
-- `ARP` discovery is fast on local networks
-- It still works when `ICMP` ping is blocked
-- It helped me build accurate host inventories for `Splunk` dashboards
-
-It also reinforced an important networking concept: `ARP` is not routed like IP traffic, so it is not filtered in the same way by traditional firewall rules.
-
-## Example Lab Activities
-
-Across the environment, I practiced:
-
-- Discovering hosts and services across lab subnets
-- Scanning systems for vulnerabilities
-- Comparing authenticated and unauthenticated scan results
-- Generating firewall, authentication, and web logs for SIEM analysis
-- Studying packet captures for scans and login attempts
-- Validating how weak credentials and exposed services create risk
-- Observing the difference between detectable online attacks and lower-visibility offline cracking workflows
-
-## Key Takeaways
-
-- Segmentation and containment matter, especially when working with intentionally vulnerable systems.
-- `pfSense` provided both security control and valuable telemetry.
-- `Splunk` helped connect network activity, host logs, and vulnerability data into a more SOC-like workflow.
-- Vulnerability scanning becomes more useful when paired with severity analysis and centralized logging.
-- Offensive tools are also powerful defensive learning tools when used in a contained lab and analyzed from the blue-team perspective.
-- Packet capture adds important context that logs alone may miss.
+- Built a segmented, isolated lab that stays off the host and home network.
+- Used `pfSense` as both a security control and a valuable log source.
+- Centralized telemetry in `Splunk` for dashboarding and raw-event analysis.
+- Practiced offensive tooling in a controlled environment with a defensive lens.
+- Reinforced the value of packet captures, firewall logs, and SIEM correlation working together.
 
 ## Responsible Use
 
-This lab was built for authorized testing and education only. All tools and techniques were used inside an isolated personal environment designed to prevent unintended interaction with external systems or the home network.
-
-## Summary
-
-This home lab gave me hands-on practice across network security, vulnerability management, SIEM monitoring, packet analysis, and security testing. By combining `pfSense`, segmented virtual networks, vulnerable lab targets, and centralized logging in `Splunk`, I was able to build a safe environment that simulated both attacker behavior and defender visibility.
+This repository documents authorized testing performed inside an isolated personal environment. All scanning, credential testing, and exploitation exercises were limited to lab-owned systems for educational and defensive learning purposes.
