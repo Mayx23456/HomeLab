@@ -37,10 +37,10 @@ function HomePage() {
               Reach out to discuss detections, architecture hardening, or lab expansion scenarios.
             </p>
             <a
-              href="mailto:max@soc-lab.local"
+              href="mailto:banerjeemayukh2496@gmail.com"
               className="mt-7 inline-flex items-center justify-center rounded-lg border border-accent bg-accent px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-background transition hover:shadow-[0_0_32px_rgba(0,255,135,0.5)]"
             >
-              max@soc-lab.local
+              banerjeemayukh2496@gmail.com
             </a>
           </div>
         </section>
