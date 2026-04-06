@@ -29,7 +29,7 @@ function NumericStatCard({ target, label }: NumericStatCardProps) {
 
 export function StatsBar() {
   return (
-    <section id="architecture" className="w-full bg-background px-6 py-10 md:px-10 lg:px-16">
+    <section id="stats" className="w-full bg-background px-6 py-10 md:px-10 lg:px-16">
       <div className="mx-auto grid w-full max-w-7xl gap-4 md:grid-cols-4">
         <NumericStatCard target={3} label="Networks Segmented" />
         <NumericStatCard target={8} label="Offensive Tools" />
