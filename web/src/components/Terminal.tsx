@@ -1,95 +1,236 @@
 import { useEffect, useMemo, useState } from 'react'
-import { motion } from 'framer-motion'
-import { terminalSequence } from '../data/terminalSequence'
+import { AnimatePresence, motion } from 'framer-motion'
+import { terminalSequence, type TerminalBlock, type TerminalRow } from '../data/terminalSequence'
 import { useTypewriter } from '../hooks/useTypewriter'
 
-type Phase = 'typing' | 'revealing' | 'waiting'
+type PlaybackStage = 'description' | 'query' | 'cursor' | 'output' | 'complete'
 
-const timestampPattern = /\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/
+const dividerLine = '─────────────────────────────────────────'
+const timestampPattern = /^(Apr \d+ \d{2}:\d{2}:\d{2})$/
+const fieldPattern = /^(host|source|sourcetype)(\s*[:=]\s*)(.+)$/i
 
-function ResponseLine({ line }: { line: string }) {
-  const timestampMatch = timestampPattern.exec(line)
+function TerminalWindowDots() {
+  return (
+    <div className="flex items-center gap-2" aria-hidden="true">
+      <span className="h-3 w-3 rounded-full bg-[#ff5f56]" />
+      <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
+      <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
+    </div>
+  )
+}
 
-  if (!timestampMatch || timestampMatch.index === undefined) {
-    return <span className="text-accent2">{line}</span>
+function renderCellContent(value: string, isAlert: boolean) {
+  const timestampMatch = timestampPattern.exec(value)
+  if (timestampMatch) {
+    return <span className="text-muted">{value}</span>
   }
 
-  const start = timestampMatch.index
-  const end = start + timestampMatch[0].length
+  const fieldMatch = fieldPattern.exec(value)
+  if (fieldMatch) {
+    return (
+      <>
+        <span className="text-[#a855f7]">{fieldMatch[1]}{fieldMatch[2]}</span>
+        <span className="text-accent2">{fieldMatch[3]}</span>
+      </>
+    )
+  }
+
+  if (isAlert) {
+    return <span className="text-danger">{value}</span>
+  }
+
+  return <span className="text-white">{value}</span>
+}
+
+function parseCount(value: string) {
+  return Number.parseInt(value.replaceAll(',', ''), 10)
+}
+
+function OutputRow({
+  row,
+  rowIndex,
+  block,
+}: {
+  row: TerminalRow
+  rowIndex: number
+  block: TerminalBlock
+}) {
+  const columnCount = row.cells.length
+  const isHeader = row.kind === 'header'
+  const isAlert = Boolean(row.alert)
+  const dataRows = block.rows.filter((entry) => entry.kind === 'row')
+  const maxCount = Math.max(
+    ...dataRows
+      .map((entry) => entry.cells[1] ?? '0')
+      .map((value) => parseCount(value))
+      .filter((value) => Number.isFinite(value)),
+    1,
+  )
 
   return (
-    <>
-      <span className="text-accent2">{line.slice(0, start)}</span>
-      <span className="rounded bg-slate-300/90 px-1 py-[1px] text-muted">{timestampMatch[0]}</span>
-      <span className="text-accent2">{line.slice(end)}</span>
-    </>
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.22, ease: 'easeOut' }}
+      className={`grid gap-3 rounded-lg px-3 py-2 ${
+        isHeader
+          ? 'text-accent2'
+          : rowIndex % 2 === 0
+            ? 'bg-surface/90'
+            : 'bg-transparent'
+      }`}
+      style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}
+    >
+      {row.cells.map((cell, cellIndex) => {
+        if (block.outputType === 'timechart' && !isHeader && cellIndex === 1) {
+          const numericValue = parseCount(cell)
+          const width = `${(numericValue / maxCount) * 100}%`
+
+          return (
+            <div key={`${row.id}-${cellIndex}`} className="flex items-center gap-3">
+              <span className="w-16 shrink-0 text-right text-white">{cell}</span>
+              <div className="h-[6px] flex-1 rounded-full bg-white/6">
+                <div
+                  className="h-full rounded-full bg-accent2"
+                  style={{
+                    width,
+                    boxShadow: '0 0 12px rgba(0, 200, 255, 0.32)',
+                  }}
+                />
+              </div>
+            </div>
+          )
+        }
+
+        return (
+          <div
+            key={`${row.id}-${cellIndex}`}
+            className={`truncate font-mono text-sm ${isHeader ? 'font-bold' : 'font-medium'}`}
+          >
+            {isHeader ? (
+              <span className="text-accent2">{cell}</span>
+            ) : (
+              renderCellContent(cell, isAlert)
+            )}
+          </div>
+        )
+      })}
+    </motion.div>
   )
 }
 
 export function Terminal() {
-  const [sequenceIndex, setSequenceIndex] = useState(0)
-  const [phase, setPhase] = useState<Phase>('typing')
-  const [visibleResponseLines, setVisibleResponseLines] = useState(0)
+  const [blockIndex, setBlockIndex] = useState(0)
+  const [stage, setStage] = useState<PlaybackStage>('description')
+  const [visibleRows, setVisibleRows] = useState(0)
+  const [autoAdvanceEnabled, setAutoAdvanceEnabled] = useState(true)
+  const [showDivider, setShowDivider] = useState(false)
 
-  const activeExchange = terminalSequence[sequenceIndex]
-  const typedCommand = useTypewriter(activeExchange.command, 20, 130)
-  const isCommandComplete = typedCommand === activeExchange.command
+  const activeBlock = terminalSequence[blockIndex]
+  const descriptionTyped = useTypewriter(activeBlock.description, 22, 0)
+  const queryTyped = useTypewriter(stage === 'query' ? activeBlock.query : '', 16, 0)
 
-  const shownLines = useMemo(
-    () => activeExchange.responseLines.slice(0, visibleResponseLines),
-    [activeExchange.responseLines, visibleResponseLines],
+  const visibleOutputRows = useMemo(
+    () => activeBlock.rows.slice(0, visibleRows),
+    [activeBlock.rows, visibleRows],
   )
 
+  const goToBlock = (nextIndex: number, shouldPauseAuto = false) => {
+    setBlockIndex(nextIndex)
+    setStage('description')
+    setVisibleRows(0)
+    setShowDivider(true)
+
+    if (shouldPauseAuto) {
+      setAutoAdvanceEnabled(false)
+    }
+  }
+
   useEffect(() => {
-    if (phase !== 'typing' || !isCommandComplete) {
+    if (stage !== 'description' || descriptionTyped !== activeBlock.description) {
       return
     }
 
     const timer = window.setTimeout(() => {
-      setPhase('revealing')
-    }, 230)
+      setStage('query')
+    }, 120)
 
     return () => window.clearTimeout(timer)
-  }, [isCommandComplete, phase])
+  }, [activeBlock.description, descriptionTyped, stage])
 
   useEffect(() => {
-    if (phase !== 'revealing') {
-      return
-    }
-
-    if (visibleResponseLines >= activeExchange.responseLines.length || activeExchange.responseLines.length === 0) {
+    if (stage !== 'query' || queryTyped !== activeBlock.query) {
       return
     }
 
     const timer = window.setTimeout(() => {
-      setVisibleResponseLines((count) => {
-        const nextCount = count + 1
-        if (nextCount >= activeExchange.responseLines.length) {
-          setPhase('waiting')
+      setStage('cursor')
+    }, 80)
+
+    return () => window.clearTimeout(timer)
+  }, [activeBlock.query, queryTyped, stage])
+
+  useEffect(() => {
+    if (stage !== 'cursor') {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setStage('output')
+    }, 600)
+
+    return () => window.clearTimeout(timer)
+  }, [stage])
+
+  useEffect(() => {
+    if (stage !== 'output') {
+      return
+    }
+
+    if (visibleRows >= activeBlock.rows.length) {
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setVisibleRows((current) => {
+        const nextValue = current + 1
+        if (nextValue >= activeBlock.rows.length) {
+          setStage('complete')
         }
-        return nextCount
+        return nextValue
       })
-    }, 160)
+    }, 80)
 
     return () => window.clearTimeout(timer)
-  }, [activeExchange.responseLines.length, phase, visibleResponseLines])
+  }, [activeBlock.rows.length, stage, visibleRows])
 
   useEffect(() => {
-    if (phase !== 'waiting') {
+    if (stage !== 'complete' || !autoAdvanceEnabled) {
       return
     }
 
-    const isLast = sequenceIndex === terminalSequence.length - 1
-    const delay = isLast ? 3000 : 1250
-
+    const isLastBlock = blockIndex === terminalSequence.length - 1
     const timer = window.setTimeout(() => {
-      setPhase('typing')
-      setVisibleResponseLines(0)
-      setSequenceIndex((current) => (current + 1) % terminalSequence.length)
-    }, delay)
+      const nextIndex = isLastBlock ? 0 : blockIndex + 1
+      goToBlock(nextIndex)
+    }, isLastBlock ? 4_000 : 2_500)
 
     return () => window.clearTimeout(timer)
-  }, [phase, sequenceIndex])
+  }, [autoAdvanceEnabled, blockIndex, stage])
+
+  const handlePrevious = () => {
+    const nextIndex = blockIndex === 0 ? terminalSequence.length - 1 : blockIndex - 1
+    goToBlock(nextIndex, true)
+  }
+
+  const handleNext = () => {
+    const nextIndex = (blockIndex + 1) % terminalSequence.length
+    goToBlock(nextIndex, true)
+  }
+
+  const displayDescription =
+    stage === 'description' ? descriptionTyped : activeBlock.description
+  const displayQuery = stage === 'query' ? queryTyped : stage === 'description' ? '' : activeBlock.query
 
   return (
     <section id="monitoring" className="w-full bg-background px-6 py-24 md:px-10 lg:px-16">
@@ -99,63 +240,151 @@ export function Terminal() {
           50%, 100% { opacity: 0; }
         }
 
+        @keyframes terminal-live-pulse {
+          0%, 100% { opacity: 0.45; box-shadow: 0 0 0 rgba(0,255,135,0); }
+          50% { opacity: 1; box-shadow: 0 0 12px rgba(0,255,135,0.45); }
+        }
+
         .terminal-cursor {
           animation: terminal-cursor-blink 1s steps(1, end) infinite;
+        }
+
+        .terminal-live-dot {
+          animation: terminal-live-pulse 1.4s ease-in-out infinite;
         }
       `}</style>
 
       <div className="mx-auto w-full max-w-7xl">
-        <div className="mb-8">
-          <h2 className="font-heading text-4xl font-black uppercase tracking-[-0.02em] text-white md:text-6xl">
-            SOC Monitoring
+        <div className="mb-12">
+          <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
+            132,532 events ingested from pfSense via UDP/1514 - Mar through Apr 2026
+          </p>
+          <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-white md:text-[96px]">
+            SOC
           </h2>
-          <p className="mt-3 max-w-3xl text-sm text-slate-300 md:text-base">
-            Splunk ingests pfSense telemetry over syslog (UDP/1514) and supports both quick
-            dashboard triage and deep event-level validation.
+          <h2
+            className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-transparent md:text-[96px]"
+            style={{ WebkitTextStroke: '2px #00ff87' }}
+          >
+            MONITORING
+          </h2>
+          <p className="mt-4 max-w-3xl text-sm text-slate-300 md:text-base">
+            132,532 events ingested from pfSense via UDP/1514 - Mar through Apr 2026
           </p>
         </div>
 
         <motion.div
-          className="overflow-hidden rounded-2xl border border-accent/30 bg-surface/90 shadow-[0_18px_60px_-28px_rgba(0,0,0,0.95)]"
+          className="overflow-hidden rounded-[28px] border border-accent/15 bg-[linear-gradient(180deg,rgba(17,17,24,0.94),rgba(10,10,15,0.98))] shadow-[0_22px_60px_rgba(0,0,0,0.34)]"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.25 }}
-          transition={{ duration: 0.45, ease: 'easeOut' }}
+          viewport={{ once: true, amount: 0.22 }}
+          transition={{ duration: 0.42, ease: 'easeOut' }}
         >
-          <div className="flex items-center justify-between border-b border-muted/50 px-4 py-3">
-            <div className="flex items-center gap-2" aria-hidden="true">
-              <span className="h-3 w-3 rounded-full bg-danger/75" />
-              <span className="h-3 w-3 rounded-full bg-[#f59e0b]/80" />
-              <span className="h-3 w-3 rounded-full bg-accent/80" />
+          <div className="flex items-center justify-between gap-4 border-b border-white/8 px-4 py-3 md:px-5">
+            <TerminalWindowDots />
+
+            <p className="hidden flex-1 text-center font-mono text-[12px] font-medium text-slate-300 md:block">
+              splunk@soc-lab - Search &amp; Reporting
+            </p>
+
+            <div className="flex items-center gap-2">
+              <span className="terminal-live-dot h-2.5 w-2.5 rounded-full bg-accent" />
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
+                LIVE
+              </span>
             </div>
-            <p className="terminal text-xs text-slate-300">splunk@soc-lab:~</p>
-            <span className="w-12" aria-hidden="true" />
           </div>
 
-          <div className="terminal min-h-[21rem] bg-background px-4 py-5 text-sm md:px-6">
-            <div className="mb-2 flex items-start gap-2">
-              <span className="text-slate-400">$</span>
-              <p className="whitespace-pre-wrap break-words text-accent">
-                {typedCommand}
-                {phase === 'typing' && <span className="terminal-cursor ml-[2px] inline-block">▋</span>}
+          <div className="bg-background px-4 py-5 font-mono md:px-5 md:py-6">
+            <div className="min-h-[31rem] space-y-3 overflow-hidden">
+              {showDivider && (
+                <>
+                  <p className="text-[13px] text-[#1a1a2e]">{dividerLine}</p>
+                  <div className="h-2" />
+                </>
+              )}
+
+              <p className="text-[13px] italic text-muted md:text-sm">
+                {displayDescription}
+                {stage === 'description' && <span className="terminal-cursor ml-1 inline-block text-muted">▋</span>}
               </p>
-            </div>
 
-            <div className="space-y-1">
-              {shownLines.map((line, index) => (
-                <p key={`${activeExchange.id}-line-${index}`} className="whitespace-pre">
-                  <ResponseLine line={line} />
+              <div className="flex items-start gap-3 text-[13px] md:text-sm">
+                <span className="pt-[1px] text-accent">❯</span>
+                <p className="min-h-[1.5rem] whitespace-pre-wrap break-words text-white">
+                  {displayQuery}
+                  {stage === 'query' && <span className="terminal-cursor ml-1 inline-block text-white">▋</span>}
                 </p>
-              ))}
+              </div>
 
-              {phase === 'revealing' && (
-                <p className="text-accent2">
+              {stage === 'cursor' && (
+                <p className="pl-6 text-white">
                   <span className="terminal-cursor inline-block">▋</span>
                 </p>
               )}
+
+              <div className="space-y-1.5 pl-6">
+                <AnimatePresence initial={false}>
+                  {visibleOutputRows.map((row, index) => (
+                    <OutputRow key={`${activeBlock.id}-${row.id}`} row={row} rowIndex={index} block={activeBlock} />
+                  ))}
+                </AnimatePresence>
+              </div>
             </div>
           </div>
         </motion.div>
+
+        <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-white/8 bg-surface/65 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-5">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-slate-400">
+            132,532 events // Mar-Apr 2026
+          </p>
+
+          <div className="flex flex-wrap items-center gap-3 md:justify-end">
+            <div className="flex items-center gap-2">
+              {terminalSequence.map((block, index) => (
+                <span
+                  key={block.id}
+                  className="h-2.5 w-2.5 rounded-full"
+                  style={{
+                    backgroundColor: blockIndex === index ? '#00ff87' : '#3a3a4a',
+                    boxShadow:
+                      blockIndex === index ? '0 0 10px rgba(0,255,135,0.38)' : 'none',
+                  }}
+                />
+              ))}
+            </div>
+
+            <button
+              type="button"
+              aria-label="Previous terminal query block"
+              onClick={handlePrevious}
+              className="rounded-full border border-white/10 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-slate-200 transition hover:border-accent/35 hover:text-accent"
+            >
+              Previous
+            </button>
+
+            <button
+              type="button"
+              aria-label="Next terminal query block"
+              onClick={handleNext}
+              className="rounded-full border border-white/10 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-slate-200 transition hover:border-accent/35 hover:text-accent"
+            >
+              Next
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+          <div className="rounded-full border border-accent/18 bg-surface/72 px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+            132,532 Events Indexed
+          </div>
+          <div className="rounded-full border border-accent2/18 bg-surface/72 px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-accent2">
+            udp:1514 Syslog Input
+          </div>
+          <div className="rounded-full border border-[#a855f7]/18 bg-surface/72 px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#a855f7]">
+            pfSense -&gt; Splunk Pipeline
+          </div>
+        </div>
       </div>
     </section>
   )
