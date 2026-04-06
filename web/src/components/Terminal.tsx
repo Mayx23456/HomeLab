@@ -76,7 +76,7 @@ function OutputRow({
         isHeader
           ? 'text-accent2'
           : rowIndex % 2 === 0
-            ? 'bg-surface/90'
+            ? 'bg-white/10'
             : 'bg-transparent'
       }`}
       style={{ gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}
@@ -259,31 +259,28 @@ export function Terminal() {
           <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
             132,532 events ingested from pfSense via UDP/1514 - Mar through Apr 2026
           </p>
-          <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-white md:text-[96px]">
+          <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-ink md:text-[96px]">
             SOC
           </h2>
-          <h2
-            className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-transparent md:text-[96px]"
-            style={{ WebkitTextStroke: '2px #00ff87' }}
-          >
+          <h2 className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-accent2 md:text-[96px]">
             MONITORING
           </h2>
-          <p className="mt-4 max-w-3xl text-sm text-slate-300 md:text-base">
+          <p className="mt-4 max-w-3xl text-sm text-ink/80 md:text-base">
             132,532 events ingested from pfSense via UDP/1514 - Mar through Apr 2026
           </p>
         </div>
 
         <motion.div
-          className="overflow-hidden rounded-[28px] border border-accent/15 bg-[linear-gradient(180deg,rgba(17,17,24,0.94),rgba(10,10,15,0.98))] shadow-[0_22px_60px_rgba(0,0,0,0.34)]"
+          className="neo-panel overflow-hidden bg-yellow"
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, amount: 0.22 }}
           transition={{ duration: 0.42, ease: 'easeOut' }}
         >
-          <div className="flex items-center justify-between gap-4 border-b border-white/8 px-4 py-3 md:px-5">
+          <div className="flex items-center justify-between gap-4 border-b-[4px] border-ink px-4 py-3 md:px-5">
             <TerminalWindowDots />
 
-            <p className="hidden flex-1 text-center font-mono text-[12px] font-medium text-slate-300 md:block">
+            <p className="hidden flex-1 text-center font-mono text-[12px] font-medium text-ink md:block">
               splunk@soc-lab - Search &amp; Reporting
             </p>
 
@@ -295,8 +292,8 @@ export function Terminal() {
             </div>
           </div>
 
-          <div className="bg-background px-4 py-5 font-mono md:px-5 md:py-6">
-            <div className="min-h-[31rem] space-y-3 overflow-hidden">
+          <div className="p-4 md:p-5">
+            <div className="neo-card min-h-[31rem] space-y-3 overflow-hidden bg-ink px-4 py-5 font-mono text-paper md:px-5 md:py-6">
               {showDivider && (
                 <>
                   <p className="text-[13px] text-[#1a1a2e]">{dividerLine}</p>
@@ -334,8 +331,8 @@ export function Terminal() {
           </div>
         </motion.div>
 
-        <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-white/8 bg-surface/65 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-5">
-          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-slate-400">
+        <div className="neo-card mt-4 flex flex-col gap-4 bg-paper px-4 py-4 md:flex-row md:items-center md:justify-between md:px-5">
+          <p className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/70">
             132,532 events // Mar-Apr 2026
           </p>
 
@@ -358,7 +355,7 @@ export function Terminal() {
               type="button"
               aria-label="Previous terminal query block"
               onClick={handlePrevious}
-              className="rounded-full border border-white/10 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-slate-200 transition hover:border-accent/35 hover:text-accent"
+              className="neo-button bg-pink px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink"
             >
               Previous
             </button>
@@ -367,7 +364,7 @@ export function Terminal() {
               type="button"
               aria-label="Next terminal query block"
               onClick={handleNext}
-              className="rounded-full border border-white/10 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-slate-200 transition hover:border-accent/35 hover:text-accent"
+              className="neo-button bg-sky px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink"
             >
               Next
             </button>
@@ -375,13 +372,13 @@ export function Terminal() {
         </div>
 
         <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-3">
-          <div className="rounded-full border border-accent/18 bg-surface/72 px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-accent">
+          <div className="neo-pill bg-lime px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink">
             132,532 Events Indexed
           </div>
-          <div className="rounded-full border border-accent2/18 bg-surface/72 px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-accent2">
+          <div className="neo-pill bg-sky px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink">
             udp:1514 Syslog Input
           </div>
-          <div className="rounded-full border border-[#a855f7]/18 bg-surface/72 px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-[#a855f7]">
+          <div className="neo-pill bg-pink px-4 py-3 text-center font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink">
             pfSense -&gt; Splunk Pipeline
           </div>
         </div>

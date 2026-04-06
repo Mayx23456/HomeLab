@@ -5,17 +5,17 @@ import { sectionConfigs } from '../data/sections'
 export function LayoutShell({ children }: PropsWithChildren) {
   return (
     <>
-      <div className="min-h-screen bg-background text-white">
-        <header className="sticky top-0 z-20 border-b border-muted/40 bg-surface/90 backdrop-blur">
-          <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-6 py-4 md:px-10">
+      <div className="min-h-screen bg-background text-ink">
+        <header className="sticky top-0 z-20 bg-background/95 py-4 backdrop-blur">
+          <div className="neo-card mx-auto flex w-full max-w-6xl items-center justify-between bg-yellow px-6 py-4 md:px-10">
             <p className="text-sm font-medium uppercase tracking-[0.16em] text-accent">
               Web Shell
             </p>
-            <nav aria-label="Section navigation">
-              <ul className="flex items-center gap-4 text-sm text-slate-200">
+            <nav aria-label="Section navigation" className="hidden md:block">
+              <ul className="flex items-center gap-4 text-sm text-ink">
                 {sectionConfigs.map((section) => (
                   <li key={section.id}>
-                    <a className="hover:text-accent2 transition-colors" href={`#${section.id}`}>
+                    <a className="neo-pill bg-paper px-3 py-2 hover:bg-sky transition-colors" href={`#${section.id}`}>
                       {section.title}
                     </a>
                   </li>

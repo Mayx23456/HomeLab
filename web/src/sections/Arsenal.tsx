@@ -6,6 +6,7 @@ type ArsenalView = 'grid' | 'detail'
 type ArsenalTab = 'HOW' | 'WHAT I DID' | 'ACHIEVED'
 
 const categoryFilters = ['ALL', ...new Set(arsenalTools.map((tool) => tool.category))]
+const brutalCardBackgrounds = ['#fff1a8', '#7ed7ff', '#ff7bd5', '#d6ff45'] as const
 
 function RadarIcon({ color }: { color: string }) {
   return (
@@ -142,39 +143,36 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
   const [activeTab, setActiveTab] = useState<ArsenalTab>('HOW')
 
   return (
-    <div className="rounded-[22px] border border-white/8 bg-[linear-gradient(180deg,rgba(17,17,24,0.98),rgba(12,12,18,0.94))] p-5 shadow-[0_22px_48px_rgba(0,0,0,0.26)] md:p-6">
-      <div className="flex flex-col gap-4 border-b border-white/8 pb-5 md:flex-row md:items-start md:justify-between">
+    <div className="neo-card bg-paper p-5 md:p-6">
+      <div className="flex flex-col gap-4 border-b-[3px] border-ink pb-5 md:flex-row md:items-start md:justify-between">
         <div className="flex items-start gap-4">
           <div
-            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border"
+            className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border-[3px] border-ink bg-white"
             style={{
-              borderColor: `${tool.categoryColour}55`,
-              backgroundColor: `${tool.categoryColour}15`,
-              boxShadow: `inset 0 0 16px ${tool.categoryColour}18`,
+              boxShadow: `4px 4px 0 ${tool.categoryColour}`,
             }}
           >
             <IconForTool icon={tool.icon} color={tool.categoryColour} />
           </div>
 
           <div>
-            <h3 className="font-mono text-xl font-bold text-white md:text-2xl">{tool.name}</h3>
+            <h3 className="font-mono text-xl font-bold text-ink md:text-2xl">{tool.name}</h3>
             <span
-              className="mt-3 inline-flex rounded-full border px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
+              className="neo-pill mt-3 inline-flex px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
               style={{
-                borderColor: `${tool.categoryColour}55`,
-                backgroundColor: `${tool.categoryColour}18`,
+                backgroundColor: '#fffdf5',
                 color: tool.categoryColour,
               }}
             >
               {tool.category}
             </span>
-            <p className="mt-4 max-w-3xl text-sm text-slate-300 md:text-base">{tool.what}</p>
+            <p className="mt-4 max-w-3xl text-sm text-ink/80 md:text-base">{tool.what}</p>
           </div>
         </div>
       </div>
 
       <div className="mt-5">
-        <div className="relative flex flex-wrap gap-2 border-b border-white/8 pb-3">
+        <div className="relative flex flex-wrap gap-2 border-b-[3px] border-ink pb-3">
           {(['HOW', 'WHAT I DID', 'ACHIEVED'] as ArsenalTab[]).map((tab) => {
             const isActive = activeTab === tab
 
@@ -183,7 +181,7 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                 key={tab}
                 type="button"
                 className={`relative rounded-full px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition ${
-                  isActive ? 'text-white' : 'text-slate-400 hover:text-slate-200'
+                  isActive ? 'text-ink' : 'text-ink/60 hover:text-ink'
                 }`}
                 onClick={() => setActiveTab(tab)}
               >
@@ -192,8 +190,9 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                     layoutId="arsenal-tab-indicator"
                     className="absolute inset-0 rounded-full"
                     style={{
-                      backgroundColor: `${tool.categoryColour}18`,
-                      border: `1px solid ${tool.categoryColour}30`,
+                      backgroundColor: tool.categoryColour,
+                      border: '3px solid #111111',
+                      boxShadow: '4px 4px 0 #111111',
                     }}
                     transition={{ type: 'spring', stiffness: 360, damping: 32 }}
                   />
@@ -215,14 +214,14 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                 transition={{ duration: 0.22, ease: 'easeOut' }}
               >
                 {tool.commands.length > 0 ? (
-                  <div className="overflow-hidden rounded-2xl border border-white/8 bg-background">
-                    <div className="flex items-center justify-between border-b border-white/8 px-4 py-3">
+                  <div className="neo-card overflow-hidden bg-ink">
+                    <div className="flex items-center justify-between border-b-[3px] border-paper/20 px-4 py-3">
                       <div className="flex items-center gap-2">
                         <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
                         <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
                         <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
                       </div>
-                      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                      <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-paper/70">
                         {tool.name}
                       </span>
                     </div>
@@ -231,7 +230,7 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                       {tool.commands.map((command) => (
                         <div key={command} className="flex gap-3">
                           <span style={{ color: tool.categoryColour }}>❯</span>
-                          <span className="break-all text-white">{command}</span>
+                          <span className="break-all text-paper">{command}</span>
                         </div>
                       ))}
                     </div>
@@ -246,7 +245,7 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                         >
                           {String(index + 1).padStart(2, '0')}
                         </span>
-                        <span className="pt-0.5 text-sm text-white md:text-base">{step}</span>
+                        <span className="pt-0.5 text-sm text-ink md:text-base">{step}</span>
                       </li>
                     ))}
                   </ol>
@@ -266,12 +265,12 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                 {tool.how.map((step, index) => (
                   <div
                     key={step}
-                    className="relative overflow-hidden rounded-2xl border border-white/8 bg-surface/80 px-5 py-5"
+                    className="neo-card relative overflow-hidden bg-white px-5 py-5"
                   >
-                    <span className="pointer-events-none absolute right-4 top-2 font-mono text-[40px] font-black leading-none text-white/10">
+                    <span className="pointer-events-none absolute right-4 top-2 font-mono text-[40px] font-black leading-none text-ink/10">
                       {String(index + 1).padStart(2, '0')}
                     </span>
-                    <p className="relative z-10 max-w-3xl text-sm text-white md:text-base">{step}</p>
+                    <p className="relative z-10 max-w-3xl text-sm text-ink md:text-base">{step}</p>
                   </div>
                 ))}
               </motion.div>
@@ -289,13 +288,13 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                 {tool.achieved.map((achievement) => (
                   <div
                     key={achievement}
-                    className="flex items-start gap-3 rounded-2xl border border-[#00ff87]/10 bg-surface/85 px-4 py-4"
-                    style={{ borderLeft: '2px solid rgba(0,255,135,0.35)' }}
+                    className="neo-card flex items-start gap-3 bg-white px-4 py-4"
+                    style={{ borderLeft: '8px solid #d6ff45' }}
                   >
                     <div className="mt-0.5">
                       <CheckIcon />
                     </div>
-                    <p className="text-sm text-white md:text-base">{achievement}</p>
+                    <p className="text-sm text-ink md:text-base">{achievement}</p>
                   </div>
                 ))}
               </motion.div>
@@ -318,12 +317,10 @@ function ToolCard({ tool, index, isExpanded, onToggle }: ToolCardProps) {
   return (
     <motion.article
       layout
-      className="overflow-hidden rounded-2xl bg-surface"
+      className="neo-card overflow-hidden"
       style={{
-        borderTop: '1px solid rgba(255,255,255,0.06)',
-        borderRight: '1px solid rgba(255,255,255,0.06)',
-        borderBottom: '1px solid rgba(255,255,255,0.06)',
-        borderLeft: `3px solid ${tool.categoryColour}`,
+        backgroundColor: brutalCardBackgrounds[index % brutalCardBackgrounds.length],
+        borderLeft: `10px solid ${tool.categoryColour}`,
       }}
       initial={{ opacity: 0, y: 24 }}
       whileInView={{ opacity: 1, y: 0 }}
@@ -333,12 +330,10 @@ function ToolCard({ tool, index, isExpanded, onToggle }: ToolCardProps) {
       <div className="px-5 py-5">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="font-mono text-[18px] font-bold text-white">{tool.name}</h3>
+            <h3 className="font-mono text-[18px] font-bold text-ink">{tool.name}</h3>
             <span
-              className="mt-3 inline-flex rounded-full border px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.16em]"
+              className="neo-pill mt-3 inline-flex bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.16em]"
               style={{
-                borderColor: `${tool.categoryColour}44`,
-                backgroundColor: `${tool.categoryColour}18`,
                 color: tool.categoryColour,
               }}
             >
@@ -346,31 +341,25 @@ function ToolCard({ tool, index, isExpanded, onToggle }: ToolCardProps) {
             </span>
           </div>
 
-          <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
-            style={{
-              borderColor: `${tool.categoryColour}33`,
-              backgroundColor: `${tool.categoryColour}14`,
-            }}
-          >
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-[3px] border-ink bg-white">
             <IconForTool icon={tool.icon} color={tool.categoryColour} />
           </div>
         </div>
 
         {!isExpanded && (
-          <p className="mt-5 text-sm leading-6 text-slate-400" style={clampTwoLinesStyle()}>
+          <p className="mt-5 text-sm leading-6 text-ink/75" style={clampTwoLinesStyle()}>
             {tool.what}
           </p>
         )}
 
         <div className="mt-6 flex items-center justify-between">
-          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-slate-500">
+          <span className="font-mono text-[11px] uppercase tracking-[0.18em] text-ink/60">
             {isExpanded ? 'Expanded' : 'Overview'}
           </span>
 
           <button
             type="button"
-            className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-white transition hover:border-white/20"
+            className="neo-button inline-flex items-center gap-2 bg-paper px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink"
             onClick={() => onToggle(tool.id)}
           >
             {isExpanded ? 'CLOSE' : 'OPEN'}
@@ -390,7 +379,7 @@ function ToolCard({ tool, index, isExpanded, onToggle }: ToolCardProps) {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.26, ease: 'easeOut' }}
-            className="border-t border-white/8 px-5 pb-5 pt-5"
+            className="border-t-[3px] border-ink px-5 pb-5 pt-5"
           >
             <DetailPanel key={tool.id} tool={tool} />
           </motion.div>
@@ -468,18 +457,18 @@ export function Arsenal() {
           <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
             Tools used. Techniques practiced. Lessons learned.
           </p>
-          <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-white md:text-[96px]">
+          <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-ink md:text-[96px]">
             ARSENAL
           </h2>
-          <p className="mt-4 max-w-3xl text-sm text-slate-300 md:text-base">
+          <p className="mt-4 max-w-3xl text-sm text-ink/80 md:text-base">
             Offensive and defensive tooling used inside the homelab to generate telemetry, test
             controls, and understand how real activity appears from both attacker and defender
             perspectives.
           </p>
         </div>
 
-        <div className="rounded-[28px] border border-accent/12 bg-[linear-gradient(180deg,rgba(17,17,24,0.88),rgba(10,10,15,0.94))] p-5 shadow-[0_24px_70px_rgba(0,0,0,0.34)] md:p-6">
-          <div className="flex flex-col gap-4 border-b border-white/8 pb-5">
+        <div className="neo-panel bg-surface p-5 md:p-6">
+          <div className="flex flex-col gap-4 border-b-[4px] border-ink pb-5">
             <div className="flex flex-wrap gap-3">
               {(['grid', 'detail'] as ArsenalView[]).map((mode) => {
                 const isActive = view === mode
@@ -488,10 +477,10 @@ export function Arsenal() {
                   <button
                     key={mode}
                     type="button"
-                    className={`rounded-full px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition ${
+                    className={`neo-button px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] ${
                       isActive
-                        ? 'bg-accent text-background shadow-[0_0_24px_rgba(0,255,135,0.26)]'
-                        : 'border border-white/10 text-slate-300 hover:border-accent/35 hover:text-accent'
+                        ? 'bg-accent text-ink'
+                        : 'bg-paper text-ink'
                     }`}
                     onClick={() => setView(mode)}
                   >
@@ -509,10 +498,10 @@ export function Arsenal() {
                   <button
                     key={category}
                     type="button"
-                    className={`rounded-full border px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition ${
+                    className={`neo-pill px-3 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.16em] transition ${
                       isActive
-                        ? 'border-white/10 bg-white/8 text-white'
-                        : 'border-white/10 text-slate-400 hover:border-white/20 hover:text-slate-200'
+                        ? 'bg-accent2 text-paper'
+                        : 'bg-paper text-ink'
                     }`}
                     onClick={() => setActiveCategory(category)}
                   >
@@ -561,13 +550,13 @@ export function Arsenal() {
                 >
                   <div>
                     <div className="md:hidden">
-                      <label className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-slate-400">
+                      <label className="mb-2 block font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-ink/70">
                         Select Tool
                       </label>
                       <select
                         value={selectedTool?.id}
                         onChange={(event) => setDetailToolId(event.target.value)}
-                        className="w-full rounded-2xl border border-white/10 bg-surface px-4 py-3 text-sm text-white outline-none transition focus:border-accent/45"
+                        className="neo-card w-full bg-paper px-4 py-3 text-sm text-ink outline-none transition focus:border-accent2"
                       >
                         {visibleTools.map((tool) => (
                           <option key={tool.id} value={tool.id}>
@@ -586,13 +575,13 @@ export function Arsenal() {
                             key={tool.id}
                             type="button"
                             onClick={() => setDetailToolId(tool.id)}
-                            className={`flex items-center gap-3 rounded-2xl border px-4 py-3 text-left transition ${
+                            className={`neo-card flex items-center gap-3 px-4 py-3 text-left transition ${
                               isActive
-                                ? 'border-white/10 text-white'
-                                : 'border-transparent text-slate-400 hover:border-white/8 hover:bg-white/[0.03] hover:text-slate-200'
+                                ? 'text-ink'
+                                : 'text-ink/65 hover:text-ink'
                             }`}
                             style={{
-                              backgroundColor: isActive ? `${tool.categoryColour}1a` : 'transparent',
+                              backgroundColor: isActive ? `${tool.categoryColour}55` : '#fffdf5',
                             }}
                           >
                             <span

@@ -19,10 +19,8 @@ export function Navbar() {
   const [activeSection, setActiveSection] = useState(navItems[0].id)
   const { scrollY } = useScroll()
 
-  const yPadding = useTransform(scrollY, [0, 80], [16, 10])
+  const yPadding = useTransform(scrollY, [0, 80], [18, 12])
   const logoScale = useTransform(scrollY, [0, 80], [1, 0.96])
-  const borderAlpha = useTransform(scrollY, [0, 80], [0, 1])
-  const borderColor = useTransform(borderAlpha, (alpha) => `rgba(0, 255, 135, ${alpha})`)
 
   useEffect(() => {
     const sections = navItems
@@ -84,22 +82,21 @@ export function Navbar() {
       `}</style>
 
       <motion.header
-        className="fixed inset-x-0 top-0 z-50 border-b border-solid bg-[rgba(10,10,15,0.78)] backdrop-blur-xl"
+        className="fixed inset-x-0 top-0 z-50 bg-background/95 backdrop-blur-sm"
         style={{
           paddingTop: yPadding,
           paddingBottom: yPadding,
-          borderBottomColor: borderColor,
         }}
       >
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 md:px-8">
+        <div className="neo-card mx-auto flex w-full max-w-7xl items-center justify-between bg-yellow px-4 py-3 md:px-8">
           <motion.a
             href="#overview"
             aria-label="Navigate to overview section"
-            className="inline-flex items-center font-mono text-sm font-semibold tracking-[0.08em] text-accent md:text-base"
+            className="inline-flex items-center font-mono text-sm font-semibold tracking-[0.08em] text-ink md:text-base"
             style={{ scale: logoScale }}
           >
             MAYUKH // SOC-LAB
-            <span aria-hidden="true" className="navbar-cursor ml-1 inline-block h-5 w-[2px] bg-accent" />
+            <span aria-hidden="true" className="navbar-cursor ml-1 inline-block h-5 w-[2px] bg-accent2" />
           </motion.a>
 
           <nav aria-label="Primary site navigation" className="hidden md:block">
@@ -112,10 +109,10 @@ export function Navbar() {
                     <a
                       href={`#${item.id}`}
                       aria-label={`Navigate to ${item.label} section`}
-                      className={`rounded-full px-4 py-2 text-sm transition-colors ${
+                      className={`neo-pill px-4 py-2 text-sm font-semibold transition-colors ${
                         isActive
-                          ? 'bg-accent/10 text-accent'
-                          : 'text-slate-200 hover:text-accent2 focus-visible:text-accent2'
+                          ? 'bg-accent text-ink'
+                          : 'bg-paper text-ink hover:bg-sky focus-visible:bg-sky'
                       }`}
                     >
                       {item.label}
@@ -129,7 +126,7 @@ export function Navbar() {
           <button
             type="button"
             aria-label={isDrawerOpen ? 'Close navigation menu' : 'Open navigation menu'}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-accent/35 text-accent md:hidden"
+            className="neo-pill inline-flex h-11 w-11 items-center justify-center bg-pink text-ink md:hidden"
             onClick={() => setIsDrawerOpen((open) => !open)}
           >
             <span aria-hidden="true" className="flex flex-col gap-1.5">
@@ -155,7 +152,7 @@ export function Navbar() {
             />
 
             <motion.aside
-              className="fixed right-0 top-0 z-50 flex h-screen w-[min(86vw,22rem)] flex-col border-l border-accent/50 bg-[rgba(10,10,15,0.96)] p-6 backdrop-blur-xl"
+              className="fixed right-0 top-0 z-50 flex h-screen w-[min(86vw,22rem)] flex-col border-l-[4px] border-ink bg-yellow p-6"
               initial={{ x: '100%' }}
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
@@ -165,20 +162,20 @@ export function Navbar() {
                 <a
                   href="#overview"
                   aria-label="Navigate to overview section"
-                  className="inline-flex items-center font-mono text-sm font-semibold tracking-[0.08em] text-accent"
+                  className="inline-flex items-center font-mono text-sm font-semibold tracking-[0.08em] text-ink"
                   onClick={closeDrawer}
                 >
                   MAYUKH // SOC-LAB
                   <span
                     aria-hidden="true"
-                    className="navbar-cursor ml-1 inline-block h-5 w-[2px] bg-accent"
+                    className="navbar-cursor ml-1 inline-block h-5 w-[2px] bg-accent2"
                   />
                 </a>
 
                 <button
                   type="button"
                   aria-label="Close navigation menu"
-                  className="rounded-md border border-accent/35 px-3 py-2 text-xs uppercase tracking-[0.12em] text-accent"
+                  className="neo-button bg-accent px-3 py-2 text-xs uppercase tracking-[0.12em] text-ink"
                   onClick={closeDrawer}
                 >
                   Close
@@ -195,10 +192,10 @@ export function Navbar() {
                         <a
                           href={`#${item.id}`}
                           aria-label={`Navigate to ${item.label} section`}
-                          className={`block rounded-lg px-4 py-3 text-base ${
+                          className={`neo-card block px-4 py-3 text-base ${
                             isActive
-                              ? 'bg-accent/10 text-accent'
-                              : 'text-slate-200 hover:text-accent2 focus-visible:text-accent2'
+                              ? 'bg-accent text-ink'
+                              : 'bg-paper text-ink hover:bg-sky focus-visible:bg-sky'
                           }`}
                           onClick={closeDrawer}
                         >

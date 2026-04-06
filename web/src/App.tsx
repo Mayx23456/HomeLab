@@ -14,7 +14,7 @@ import { StatsBar } from './sections/StatsBar'
 
 function HomePage() {
   return (
-    <div className="min-h-screen bg-background text-white">
+    <div className="min-h-screen bg-background text-ink">
       <Navbar />
 
       <main>
@@ -26,19 +26,19 @@ function HomePage() {
         <Terminal />
 
         <section id="contact" className="w-full bg-background px-6 pb-24 pt-8 md:px-10 lg:px-16">
-          <div className="mx-auto w-full max-w-7xl rounded-2xl border border-accent/25 bg-surface/80 p-8 md:p-10">
+          <div className="neo-panel mx-auto w-full max-w-7xl bg-lime p-8 md:p-10">
             <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
               Contact Channel
             </p>
-            <h2 className="mt-3 font-heading text-3xl font-black uppercase tracking-[-0.02em] text-white md:text-5xl">
+            <h2 className="mt-3 font-heading text-3xl font-black uppercase tracking-[-0.02em] text-ink md:text-5xl">
               Ready To Collaborate
             </h2>
-            <p className="mt-4 max-w-2xl text-sm text-slate-300 md:text-base">
+            <p className="mt-4 max-w-2xl text-sm text-ink/80 md:text-base">
               Reach out to discuss detections, architecture hardening, or lab expansion scenarios.
             </p>
             <a
               href="mailto:banerjeemayukh2496@gmail.com"
-              className="mt-7 inline-flex items-center justify-center rounded-lg border border-accent bg-accent px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-background transition hover:shadow-[0_0_32px_rgba(0,255,135,0.5)]"
+              className="neo-button mt-7 inline-flex items-center justify-center bg-accent px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-ink"
             >
               banerjeemayukh2496@gmail.com
             </a>
@@ -55,7 +55,7 @@ function ScrollProgressBar() {
 
   return (
     <motion.div
-      className="fixed left-0 right-0 top-0 z-[70] h-[2px] bg-accent"
+      className="fixed left-0 right-0 top-0 z-[70] h-[6px] bg-accent"
       aria-hidden="true"
       style={{ scaleX, transformOrigin: 'left', willChange: 'transform' }}
     />

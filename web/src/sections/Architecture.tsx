@@ -103,28 +103,21 @@ function percent(value: number, total: number) {
 function NodeCard({ node }: { node: TopologyNode }) {
   return (
     <div
-      className={`absolute rounded-2xl bg-surface/95 px-4 py-4 backdrop-blur-sm ${
-        node.large ? 'shadow-[0_0_40px_rgba(0,255,135,0.14)]' : ''
-      }`}
+      className="neo-card absolute px-4 py-4"
       style={{
         left: percent(node.x, topologyViewBox.width),
         top: percent(node.y, topologyViewBox.height),
         width: percent(node.width, topologyViewBox.width),
         minHeight: percent(node.height, topologyViewBox.height),
-        borderTop: `3px solid ${node.accent}`,
-        borderLeft: `1px solid ${node.accent}33`,
-        borderRight: `1px solid ${node.accent}33`,
-        borderBottom: `1px solid ${node.accent}33`,
-        boxShadow: `inset 0 0 24px ${node.accent}14, 0 18px 50px rgba(0, 0, 0, 0.28)`,
+        backgroundColor: node.large ? '#d6ff45' : '#fffdf5',
+        outline: node.large ? `4px solid ${node.accent}` : undefined,
       }}
     >
       <div className="flex items-start gap-3">
         <div
-          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border-[3px] border-ink bg-white"
           style={{
-            borderColor: `${node.accent}55`,
-            backgroundColor: `${node.accent}14`,
-            boxShadow: `inset 0 0 16px ${node.accent}18`,
+            boxShadow: `4px 4px 0 ${node.accent}`,
           }}
         >
           <NodeIcon icon={node.icon} color={node.accent} />
@@ -132,18 +125,17 @@ function NodeCard({ node }: { node: TopologyNode }) {
 
         <div className="min-w-0">
           <p
-            className={`font-mono uppercase text-white ${
+            className={`font-mono uppercase text-ink ${
               node.large ? 'text-base font-bold tracking-[0.02em]' : 'text-sm font-bold tracking-[0.02em]'
             }`}
           >
             {node.label}
           </p>
           <span
-            className="mt-3 inline-flex rounded-full border px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
+            className="neo-pill mt-3 inline-flex px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
             style={{
-              borderColor: `${node.accent}55`,
               color: node.accent,
-              backgroundColor: `${node.accent}12`,
+              backgroundColor: '#fffdf5',
             }}
           >
             {node.badge}
@@ -162,47 +154,39 @@ export function Architecture() {
           <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
             Segmented network map with monitored traffic flow
           </p>
-          <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-white md:text-[96px]">
+          <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-ink md:text-[96px]">
             NETWORK
           </h2>
-          <h2
-            className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-transparent md:text-[96px]"
-            style={{ WebkitTextStroke: '2px #00ff87' }}
-          >
+          <h2 className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-accent2 md:text-[96px]">
             TOPOLOGY
           </h2>
-          <p className="mt-4 max-w-2xl text-sm text-slate-300 md:text-base">
+          <p className="mt-4 max-w-2xl text-sm text-ink/80 md:text-base">
             A clean 2D view of the homelab showing the trust boundary, segmented zones, and the
             main monitored traffic paths.
           </p>
         </div>
 
         <div className="relative">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-[-24px] rounded-[34px] bg-[radial-gradient(circle_at_50%_30%,rgba(0,255,135,0.08),transparent_58%)]"
-          />
+          <div aria-hidden="true" className="pointer-events-none absolute -left-5 -top-5 h-20 w-20 rotate-6 border-[4px] border-ink bg-pink" />
 
           <div className="overflow-x-auto pb-2">
             <div className="min-w-[920px]">
-              <div className="relative aspect-[1000/640] overflow-hidden rounded-[28px] border border-accent/15 bg-[linear-gradient(180deg,rgba(9,9,16,0.98),rgba(17,17,24,0.94))] shadow-[0_28px_80px_rgba(0,0,0,0.38)]">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(0,255,135,0.06),transparent_38%),linear-gradient(rgba(255,255,255,0.018)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] bg-[size:auto,32px_32px,32px_32px]" />
+              <div className="neo-panel relative aspect-[1000/640] overflow-hidden bg-paper">
+                <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(17,17,17,0.08)_1px,transparent_1px),linear-gradient(90deg,rgba(17,17,17,0.08)_1px,transparent_1px)] bg-[size:32px_32px]" />
 
                 {topologyZones.map((zone) => (
                   <div
                     key={zone.id}
-                    className="absolute rounded-[24px] border border-dashed backdrop-blur-[2px]"
+                    className="absolute rounded-[24px] border-[3px] border-dashed border-ink"
                     style={{
                       left: percent(zone.x, topologyViewBox.width),
                       top: percent(zone.y, topologyViewBox.height),
                       width: percent(zone.width, topologyViewBox.width),
                       height: percent(zone.height, topologyViewBox.height),
-                      borderColor: `${zone.accent}44`,
-                      background: `linear-gradient(180deg, ${zone.accent}10, rgba(17,17,24,0.22))`,
-                      boxShadow: `inset 0 0 22px ${zone.accent}10`,
+                      background: `${zone.accent}20`,
                     }}
                   >
-                    <div className="absolute left-5 top-5 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-slate-200">
+                    <div className="neo-pill absolute left-5 top-5 bg-white px-3 py-1 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-ink">
                       {zone.label}
                     </div>
                   </div>
@@ -233,14 +217,11 @@ export function Architecture() {
                         d={arrow.path}
                         fill="none"
                         stroke={arrow.accent}
-                        strokeWidth={arrow.dashed ? 2.2 : 2.4}
+                        strokeWidth={arrow.dashed ? 3.2 : 3.6}
                         strokeDasharray={arrow.dashed ? '10 8' : undefined}
                         strokeLinecap="round"
                         markerEnd="url(#arrow-head-accent)"
                         opacity={arrow.subtle ? 0.68 : 0.95}
-                        style={{
-                          filter: `drop-shadow(0 0 8px ${arrow.accent}55)`,
-                        }}
                       />
                     </g>
                   ))}
@@ -253,25 +234,25 @@ export function Architecture() {
                 </div>
 
                 <div className="pointer-events-none absolute inset-0">
-                  <span className="absolute left-[46%] top-[15%] rounded-full border border-white/15 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-100">
+                  <span className="neo-pill absolute left-[46%] top-[15%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink">
                     WAN
                   </span>
-                  <span className="absolute left-[26%] top-[53%] rounded-full border border-[#f59e0b]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
+                  <span className="neo-pill absolute left-[26%] top-[53%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
                     LAN
                   </span>
-                  <span className="absolute left-[45%] top-[56%] rounded-full border border-[#ff3c3c]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff3c3c]">
+                  <span className="neo-pill absolute left-[45%] top-[56%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff3c3c]">
                     SERVER NET
                   </span>
-                  <span className="absolute left-[58%] top-[47%] rounded-full border border-[#00c8ff]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
+                  <span className="neo-pill absolute left-[58%] top-[47%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
                     SYSLOG
                   </span>
-                  <span className="absolute left-[69%] top-[56%] rounded-full border border-[#6366f1]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#6366f1]">
+                  <span className="neo-pill absolute left-[69%] top-[56%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#6366f1]">
                     WORKSTATION NET
                   </span>
-                  <span className="absolute left-[30%] top-[72%] rounded-full border border-[#f59e0b]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
+                  <span className="neo-pill absolute left-[30%] top-[72%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
                     ATTACK PATH
                   </span>
-                  <span className="absolute left-[56%] top-[73%] rounded-full border border-[#00c8ff]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
+                  <span className="neo-pill absolute left-[56%] top-[73%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
                     TELEMETRY
                   </span>
                 </div>
@@ -280,31 +261,31 @@ export function Architecture() {
           </div>
 
           <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-3">
-            <div className="rounded-2xl border border-accent/12 bg-surface/60 p-4">
+            <div className="neo-card bg-yellow p-4">
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent">
                 Security Boundary
               </p>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-ink/80">
                 `pfSense` sits at the center of the lab and controls routing, segmentation, and
                 monitored traffic flow.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-accent2/12 bg-surface/60 p-4">
+            <div className="neo-card bg-sky p-4">
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent2">
                 Detection Path
               </p>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-ink/80">
                 Logs and telemetry move toward `Splunk SIEM`, which acts as the central monitoring
                 point for the lab.
               </p>
             </div>
 
-            <div className="rounded-2xl border border-danger/12 bg-surface/60 p-4">
+            <div className="neo-card bg-pink p-4">
               <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-danger">
                 Segmented Zones
               </p>
-              <p className="mt-2 text-sm text-slate-300">
+              <p className="mt-2 text-sm text-ink/80">
                 Attacker, target, monitoring, and workstation systems are visually separated into
                 distinct zones to make the architecture easier to read.
               </p>

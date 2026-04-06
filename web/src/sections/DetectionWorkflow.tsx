@@ -46,6 +46,8 @@ const workflowSteps: WorkflowStep[] = [
   },
 ]
 
+const workflowStepBackgrounds = ['#d6ff45', '#7ed7ff', '#ffd84d', '#ff7bd5', '#ffb089'] as const
+
 export function DetectionWorkflow() {
   const sectionRef = useRef<HTMLElement | null>(null)
   const { scrollYProgress } = useScroll({
@@ -62,13 +64,13 @@ export function DetectionWorkflow() {
     >
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-12">
-          <h2 className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-white md:text-[96px]">
+          <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
+            Packet to alert, mapped as a response chain
+          </p>
+          <h2 className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-ink md:text-[96px]">
             DETECTION
           </h2>
-          <h2
-            className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-transparent md:text-[96px]"
-            style={{ WebkitTextStroke: '2px #00ff87' }}
-          >
+          <h2 className="font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-accent md:text-[96px]">
             WORKFLOW
           </h2>
         </div>
@@ -81,11 +83,11 @@ export function DetectionWorkflow() {
               preserveAspectRatio="none"
               aria-hidden="true"
             >
-              <line x1="1" y1="0" x2="1" y2="1000" stroke="#3a3a4a" strokeWidth="2" />
+              <line x1="1" y1="0" x2="1" y2="1000" stroke="#111111" strokeWidth="4" />
               <motion.path
                 d="M 1 0 V 1000"
-                stroke="#00ff87"
-                strokeWidth="2"
+                stroke="#2155ff"
+                strokeWidth="4"
                 style={{ pathLength: linePathLength }}
                 strokeLinecap="round"
               />
@@ -111,24 +113,25 @@ export function DetectionWorkflow() {
                   />
 
                   <motion.article
-                    className={`relative max-w-xl overflow-hidden rounded-2xl border border-accent/20 bg-surface/85 p-6 md:p-7 ${cardEdge}`}
+                    className={`neo-card relative max-w-xl overflow-hidden p-6 md:p-7 ${cardEdge}`}
                     initial={{ opacity: 0, x: isLeft ? -72 : 72 }}
                     whileInView={{ opacity: 1, x: 0 }}
                     viewport={{ once: true, margin: '-100px' }}
                     transition={{ duration: 0.55, ease: 'easeOut' }}
+                    style={{ backgroundColor: workflowStepBackgrounds[index] }}
                   >
                     <span
-                      className="pointer-events-none absolute right-4 top-2 select-none font-mono text-[80px] font-black leading-none text-accent/20"
+                      className="pointer-events-none absolute right-4 top-2 select-none font-mono text-[80px] font-black leading-none text-ink/10"
                       aria-hidden="true"
                     >
                       {step.number}
                     </span>
 
-                    <p className="terminal text-xs font-semibold uppercase tracking-[0.18em] text-accent">
+                    <p className="terminal text-xs font-semibold uppercase tracking-[0.18em] text-accent2">
                       Step {step.number}
                     </p>
-                    <h3 className="mt-3 text-xl font-bold text-white md:text-2xl">{step.title}</h3>
-                    <p className="mt-3 text-sm text-slate-300 md:text-base">{step.description}</p>
+                    <h3 className="mt-3 text-xl font-bold text-ink md:text-2xl">{step.title}</h3>
+                    <p className="mt-3 text-sm text-ink/80 md:text-base">{step.description}</p>
                   </motion.article>
                 </li>
               )

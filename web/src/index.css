@@ -3,9 +3,10 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
-  --background: #0a0a0f;
-  --primary: #00ff87;
+  color-scheme: light;
+  --background: #f7f1e1;
+  --primary: #ff5b2e;
+  --ink: #111111;
 }
 
 .dark {
@@ -29,9 +30,22 @@ body {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   line-height: 1.5;
   background-color: var(--background);
-  color: #f5f5f5;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.14) 1px, transparent 0),
+    radial-gradient(circle at top left, rgba(255, 91, 46, 0.12), transparent 24rem),
+    radial-gradient(circle at bottom right, rgba(33, 85, 255, 0.12), transparent 26rem);
+  background-size:
+    24px 24px,
+    auto,
+    auto;
+  color: var(--ink);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #2155ff;
+  color: #fffdf5;
 }
 
 a {
@@ -40,8 +54,8 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid #00ff87;
-  outline-offset: 2px;
+  outline: 3px solid #2155ff;
+  outline-offset: 3px;
 }
 
 img,
@@ -88,6 +102,47 @@ samp,
 
 #root {
   min-height: 100vh;
+}
+
+@layer components {
+  .neo-panel {
+    border: 4px solid #111111;
+    border-radius: 2rem;
+    box-shadow: 12px 12px 0 #111111;
+  }
+
+  .neo-card {
+    border: 3px solid #111111;
+    border-radius: 1.5rem;
+    box-shadow: 8px 8px 0 #111111;
+  }
+
+  .neo-pill {
+    border: 3px solid #111111;
+    border-radius: 999px;
+    box-shadow: 4px 4px 0 #111111;
+  }
+
+  .neo-button {
+    border: 3px solid #111111;
+    border-radius: 999px;
+    box-shadow: 6px 6px 0 #111111;
+    transition:
+      transform 0.14s ease,
+      box-shadow 0.14s ease,
+      background-color 0.14s ease,
+      color 0.14s ease;
+  }
+
+  .neo-button:hover {
+    transform: translate(2px, 2px);
+    box-shadow: 4px 4px 0 #111111;
+  }
+
+  .neo-button:active {
+    transform: translate(4px, 4px);
+    box-shadow: 2px 2px 0 #111111;
+  }
 }
 
 @keyframes hero-ticker-loop {
