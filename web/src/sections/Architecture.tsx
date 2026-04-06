@@ -38,6 +38,7 @@ type EdgePulseProps = {
   travelMs: number
   direction?: 'forward' | 'reverse'
   layoutVersion: string
+  runKey: number
 }
 
 function ComputerIcon({ color }: IconProps) {
@@ -270,6 +271,7 @@ function EdgePulse({
   travelMs,
   direction = 'forward',
   layoutVersion,
+  runKey,
 }: EdgePulseProps) {
   const [pathState, setPathState] = useState<{
     path: SVGPathElement
@@ -285,11 +287,15 @@ function EdgePulse({
     }
 
     let frameId = 0
-    let nestedFrameId = 0
+    let attempts = 0
 
     const resolvePath = () => {
       const path = findEdgePath(container, edgeId)
       if (!path) {
+        attempts += 1
+        if (attempts < 24) {
+          frameId = window.requestAnimationFrame(resolvePath)
+        }
         return
       }
 
@@ -300,15 +306,12 @@ function EdgePulse({
       })
     }
 
-    frameId = window.requestAnimationFrame(() => {
-      nestedFrameId = window.requestAnimationFrame(resolvePath)
-    })
+    frameId = window.requestAnimationFrame(resolvePath)
 
     return () => {
       window.cancelAnimationFrame(frameId)
-      window.cancelAnimationFrame(nestedFrameId)
     }
-  }, [containerRef, edgeId, layoutVersion])
+  }, [containerRef, edgeId, layoutVersion, runKey])
 
   const localProgress = (elapsedMs - delayMs) / travelMs
   const isVisible = localProgress >= 0 && localProgress <= 1 && Boolean(pathState)
@@ -371,7 +374,7 @@ export function Architecture() {
     togglePaused,
   } = useAttackSimulation()
 
-  const layoutVersion = `${isMobile}-${width}-${runKey}`
+  const layoutVersion = `${isMobile}-${width}`
   const activeNodeIds = new Set(currentScenario.activeNodeIds)
   const activeEdgeIds = new Set(currentScenario.highlightedEdgeIds)
 
@@ -494,7 +497,6 @@ export function Architecture() {
             className="relative h-[450px] overflow-hidden rounded-[28px] border border-[rgba(0,255,135,0.15)] bg-[rgba(8,8,15,0.94)] md:h-[700px]"
           >
             <ReactFlow
-              key={layoutVersion}
               nodes={nodes}
               edges={edges}
               nodeTypes={nodeTypes}
@@ -530,6 +532,7 @@ export function Architecture() {
                     travelMs={stream.travelMs}
                     direction={stream.direction}
                     layoutVersion={layoutVersion}
+                    runKey={runKey}
                   />
                 )),
               )}
