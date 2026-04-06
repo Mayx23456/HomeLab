@@ -141,10 +141,6 @@ function clampTwoLinesStyle() {
 function DetailPanel({ tool }: { tool: ArsenalTool }) {
   const [activeTab, setActiveTab] = useState<ArsenalTab>('HOW')
 
-  useEffect(() => {
-    setActiveTab('HOW')
-  }, [tool.id])
-
   return (
     <div className="rounded-[22px] border border-white/8 bg-[linear-gradient(180deg,rgba(17,17,24,0.98),rgba(12,12,18,0.94))] p-5 shadow-[0_22px_48px_rgba(0,0,0,0.26)] md:p-6">
       <div className="flex flex-col gap-4 border-b border-white/8 pb-5 md:flex-row md:items-start md:justify-between">
@@ -396,7 +392,7 @@ function ToolCard({ tool, index, isExpanded, onToggle }: ToolCardProps) {
             transition={{ duration: 0.26, ease: 'easeOut' }}
             className="border-t border-white/8 px-5 pb-5 pt-5"
           >
-            <DetailPanel tool={tool} />
+            <DetailPanel key={tool.id} tool={tool} />
           </motion.div>
         )}
       </AnimatePresence>
@@ -416,22 +412,6 @@ export function Arsenal() {
     activeCategory === 'ALL'
       ? arsenalTools
       : arsenalTools.filter((tool) => tool.category === activeCategory)
-
-  useEffect(() => {
-    if (visibleTools.length === 0) {
-      return
-    }
-
-    const toolStillVisible = visibleTools.some((tool) => tool.id === detailToolId)
-    if (!toolStillVisible) {
-      setDetailToolId(visibleTools[0].id)
-    }
-
-    const expandedStillVisible = visibleTools.some((tool) => tool.id === expandedToolId)
-    if (expandedToolId && !expandedStillVisible) {
-      setExpandedToolId(null)
-    }
-  }, [detailToolId, expandedToolId, visibleTools])
 
   useEffect(() => {
     return () => {
@@ -461,6 +441,9 @@ export function Arsenal() {
   }, [pendingToolId])
 
   const selectedTool = visibleTools.find((tool) => tool.id === detailToolId) ?? visibleTools[0]
+  const activeExpandedToolId = visibleTools.some((tool) => tool.id === expandedToolId)
+    ? expandedToolId
+    : null
 
   const handleToggleCard = (toolId: string) => {
     if (expandedToolId === toolId) {
@@ -560,7 +543,7 @@ export function Arsenal() {
                           key={tool.id}
                           tool={tool}
                           index={index}
-                          isExpanded={expandedToolId === tool.id}
+                          isExpanded={activeExpandedToolId === tool.id}
                           onToggle={handleToggleCard}
                         />
                       ))}
