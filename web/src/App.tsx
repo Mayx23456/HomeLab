@@ -81,12 +81,12 @@ function App() {
   return (
     <HelmetProvider>
       <Helmet>
-        <title>Max — HomeLab SOC</title>
+        <title>Mayukh Banerjee — HomeLab SOC</title>
         <meta
           name="description"
           content="Segmented VirtualBox security lab with pfSense routing, Splunk SIEM monitoring, and controlled blue-team detection workflows."
         />
-        <meta property="og:title" content="Max — HomeLab SOC" />
+        <meta property="og:title" content="Mayukh Banerjee — HomeLab SOC" />
         <meta
           property="og:description"
           content="Segmented VirtualBox security lab with pfSense routing, Splunk SIEM monitoring, and controlled blue-team detection workflows."

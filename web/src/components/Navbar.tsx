@@ -98,7 +98,7 @@ export function Navbar() {
             className="inline-flex items-center font-mono text-sm font-semibold tracking-[0.08em] text-accent md:text-base"
             style={{ scale: logoScale }}
           >
-            MAX // SOC-LAB
+            MAYUKH // SOC-LAB
             <span aria-hidden="true" className="navbar-cursor ml-1 inline-block h-5 w-[2px] bg-accent" />
           </motion.a>
 
@@ -168,7 +168,7 @@ export function Navbar() {
                   className="inline-flex items-center font-mono text-sm font-semibold tracking-[0.08em] text-accent"
                   onClick={closeDrawer}
                 >
-                  MAX // SOC-LAB
+                  MAYUKH // SOC-LAB
                   <span
                     aria-hidden="true"
                     className="navbar-cursor ml-1 inline-block h-5 w-[2px] bg-accent"

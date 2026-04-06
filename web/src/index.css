@@ -4,6 +4,12 @@
 
 :root {
   color-scheme: dark;
+  --background: #0a0a0f;
+  --primary: #00ff87;
+}
+
+.dark {
+  --background: oklch(0 0 0);
 }
 
 *,
@@ -22,7 +28,7 @@ body {
   min-height: 100vh;
   font-family: 'Space Grotesk', system-ui, sans-serif;
   line-height: 1.5;
-  background-color: #0a0a0f;
+  background-color: var(--background);
   color: #f5f5f5;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -82,4 +88,21 @@ samp,
 
 #root {
   min-height: 100vh;
+}
+
+@keyframes hero-ticker-loop {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.hero-ticker-track {
+  display: inline-flex;
+  width: max-content;
+  animation: hero-ticker-loop 24s linear infinite;
+  will-change: transform;
 }
