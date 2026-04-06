@@ -1,44 +1,14 @@
-import { useEffect, useRef, useState } from 'react'
 import {
-  Background,
-  BackgroundVariant,
-  Handle,
-  Position,
-  ReactFlow,
-  type NodeProps,
-  type NodeTypes,
-} from '@xyflow/react'
-import { AnimatePresence, motion } from 'framer-motion'
-import '@xyflow/react/dist/style.css'
-import {
-  topologyEdges,
-  topologyNodeIds,
+  topologyArrows,
   topologyNodes,
-  type TopologyDeviceNode,
-  type TopologyDeviceNodeData,
-  type TopologyEdge,
+  topologyViewBox,
+  topologyZones,
+  type TopologyIconName,
   type TopologyNode,
-  type TopologyZoneNode,
 } from '../data/topology'
-import { useAttackSimulation } from '../hooks/useAttackSimulation'
-import { useWindowSize } from '../hooks/useWindowSize'
-
-const hiddenHandleClass = '!h-2 !w-2 !border-0 !bg-transparent !opacity-0'
 
 type IconProps = {
   color: string
-}
-
-type EdgePulseProps = {
-  containerRef: React.RefObject<HTMLDivElement | null>
-  edgeId: string
-  color: string
-  elapsedMs: number
-  delayMs: number
-  travelMs: number
-  direction?: 'forward' | 'reverse'
-  layoutVersion: string
-  runKey: number
 }
 
 function ComputerIcon({ color }: IconProps) {
@@ -107,7 +77,7 @@ function WindowsIcon({ color }: IconProps) {
   )
 }
 
-function NodeIcon({ icon, color }: { icon: TopologyDeviceNodeData['icon']; color: string }) {
+function NodeIcon({ icon, color }: { icon: TopologyIconName; color: string }) {
   switch (icon) {
     case 'computer':
       return <ComputerIcon color={color} />
@@ -126,351 +96,71 @@ function NodeIcon({ icon, color }: { icon: TopologyDeviceNodeData['icon']; color
   }
 }
 
-function DeviceNodeCard({ data }: NodeProps<TopologyDeviceNode>) {
-  const isFirewall = data.kind === 'firewall'
-  const isLarge = Boolean(data.large)
-  const activeGlow = data.isActive ? `${data.accent}88` : `${data.accent}38`
-  const baseGlow = data.isActive ? '0 0 30px -12px' : '0 0 18px -16px'
-  const rapidClass = data.rapidPulse ? 'topology-node-splunk-pulse' : ''
-  const firewallClass = isFirewall ? 'topology-firewall-shell' : ''
+function percent(value: number, total: number) {
+  return `${(value / total) * 100}%`
+}
 
+function NodeCard({ node }: { node: TopologyNode }) {
   return (
     <div
-      className={`relative overflow-visible rounded-2xl bg-[#111118] ${isLarge ? 'w-[300px] px-6 py-5' : 'w-[188px] px-4 py-3'} ${rapidClass} ${firewallClass}`}
+      className={`absolute rounded-2xl bg-surface/95 px-4 py-4 backdrop-blur-sm ${
+        node.large ? 'shadow-[0_0_40px_rgba(0,255,135,0.14)]' : ''
+      }`}
       style={{
-        borderTop: `3px solid ${data.accent}`,
-        borderLeft: `1px solid ${data.accent}30`,
-        borderRight: `1px solid ${data.accent}30`,
-        borderBottom: `1px solid ${data.accent}30`,
-        boxShadow: `inset 0 0 24px ${data.accent}18, ${baseGlow} ${activeGlow}`,
+        left: percent(node.x, topologyViewBox.width),
+        top: percent(node.y, topologyViewBox.height),
+        width: percent(node.width, topologyViewBox.width),
+        minHeight: percent(node.height, topologyViewBox.height),
+        borderTop: `3px solid ${node.accent}`,
+        borderLeft: `1px solid ${node.accent}33`,
+        borderRight: `1px solid ${node.accent}33`,
+        borderBottom: `1px solid ${node.accent}33`,
+        boxShadow: `inset 0 0 24px ${node.accent}14, 0 18px 50px rgba(0, 0, 0, 0.28)`,
       }}
     >
-      <Handle id="top" type="target" position={Position.Top} className={hiddenHandleClass} />
-      <Handle id="right" type="source" position={Position.Right} className={hiddenHandleClass} />
-      <Handle id="bottom" type="source" position={Position.Bottom} className={hiddenHandleClass} />
-      <Handle id="left" type="target" position={Position.Left} className={hiddenHandleClass} />
-
       <div className="flex items-start gap-3">
         <div
-          className="flex h-10 w-10 items-center justify-center rounded-xl border"
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border"
           style={{
-            borderColor: `${data.accent}66`,
-            backgroundColor: `${data.accent}15`,
-            boxShadow: `inset 0 0 16px ${data.accent}22`,
+            borderColor: `${node.accent}55`,
+            backgroundColor: `${node.accent}14`,
+            boxShadow: `inset 0 0 16px ${node.accent}18`,
           }}
         >
-          <NodeIcon icon={data.icon} color={data.accent} />
+          <NodeIcon icon={node.icon} color={node.accent} />
         </div>
 
-        <div className="min-w-0 flex-1">
-          <p className="font-mono text-sm font-bold uppercase tracking-[0.02em] text-white">
-            {data.label}
+        <div className="min-w-0">
+          <p
+            className={`font-mono uppercase text-white ${
+              node.large ? 'text-base font-bold tracking-[0.02em]' : 'text-sm font-bold tracking-[0.02em]'
+            }`}
+          >
+            {node.label}
           </p>
           <span
             className="mt-3 inline-flex rounded-full border px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
             style={{
-              borderColor: `${data.accent}55`,
-              color: data.accent,
-              backgroundColor: `${data.accent}16`,
+              borderColor: `${node.accent}55`,
+              color: node.accent,
+              backgroundColor: `${node.accent}12`,
             }}
           >
-            {data.roleBadge}
+            {node.badge}
           </span>
         </div>
       </div>
-
-      <AnimatePresence>
-        {Boolean(data.flashAlert) && (
-          <motion.div
-            key={`flash-${data.flashKey ?? 0}`}
-            className="pointer-events-none absolute inset-[-2px] rounded-[18px] border border-[#ff3c3c]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.95, 0] }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.8, ease: 'easeOut' }}
-            style={{ boxShadow: '0 0 0 1px rgba(255,60,60,0.45), 0 0 28px rgba(255,60,60,0.50)' }}
-          />
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {Boolean(data.showAlert) && (
-          <motion.div
-            key={`alert-${data.alertKey ?? 0}`}
-            className="pointer-events-none absolute left-1/2 top-[-20px] -translate-x-1/2 rounded-full border border-[#ff3c3c]/65 bg-[#190d11]/95 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-[#ff8d8d]"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: [0, 1, 1, 0], y: [6, -4, -4, -10] }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.5, ease: 'easeOut' }}
-          >
-            ALERT TRIGGERED
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
-  )
-}
-
-function ZoneBadgeNode({ data }: NodeProps<TopologyZoneNode>) {
-  return (
-    <div className="pointer-events-none select-none rounded-full border border-dashed border-slate-500/55 bg-transparent px-5 py-3 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-slate-300">
-      <Handle id="top" type="target" position={Position.Top} className={hiddenHandleClass} />
-      <Handle id="bottom" type="source" position={Position.Bottom} className={hiddenHandleClass} />
-      {data.label}
-    </div>
-  )
-}
-
-const nodeTypes: NodeTypes = {
-  deviceNode: DeviceNodeCard,
-  zoneNode: ZoneBadgeNode,
-}
-
-function findEdgePath(container: HTMLDivElement, edgeId: string) {
-  return (
-    container.querySelector<SVGPathElement>(
-      `.react-flow__edge[data-id="${edgeId}"] .react-flow__edge-path`,
-    ) ??
-    container.querySelector<SVGPathElement>(`[data-id="${edgeId}"] .react-flow__edge-path`) ??
-    container.querySelector<SVGPathElement>(`#react-flow__edge-${edgeId} .react-flow__edge-path`)
-  )
-}
-
-function getPointAlongPath(
-  path: SVGPathElement,
-  length: number,
-  progress: number,
-  container: HTMLDivElement,
-) {
-  const svg = path.ownerSVGElement
-  const ctm = path.getScreenCTM()
-  if (!svg || !ctm) {
-    return null
-  }
-
-  const pathPoint = path.getPointAtLength(length * progress)
-  const svgPoint = svg.createSVGPoint()
-  svgPoint.x = pathPoint.x
-  svgPoint.y = pathPoint.y
-
-  const screenPoint = svgPoint.matrixTransform(ctm)
-  const containerRect = container.getBoundingClientRect()
-
-  return {
-    x: screenPoint.x - containerRect.left,
-    y: screenPoint.y - containerRect.top,
-  }
-}
-
-function EdgePulse({
-  containerRef,
-  edgeId,
-  color,
-  elapsedMs,
-  delayMs,
-  travelMs,
-  direction = 'forward',
-  layoutVersion,
-  runKey,
-}: EdgePulseProps) {
-  const [pathState, setPathState] = useState<{
-    path: SVGPathElement
-    length: number
-    container: HTMLDivElement
-  } | null>(null)
-  const size = 12
-
-  useEffect(() => {
-    const container = containerRef.current
-    if (!container) {
-      return undefined
-    }
-
-    let frameId = 0
-    let attempts = 0
-
-    const resolvePath = () => {
-      const path = findEdgePath(container, edgeId)
-      if (!path) {
-        attempts += 1
-        if (attempts < 24) {
-          frameId = window.requestAnimationFrame(resolvePath)
-        }
-        return
-      }
-
-      setPathState({
-        path,
-        length: path.getTotalLength(),
-        container,
-      })
-    }
-
-    frameId = window.requestAnimationFrame(resolvePath)
-
-    return () => {
-      window.cancelAnimationFrame(frameId)
-    }
-  }, [containerRef, edgeId, layoutVersion, runKey])
-
-  const localProgress = (elapsedMs - delayMs) / travelMs
-  const isVisible = localProgress >= 0 && localProgress <= 1 && Boolean(pathState)
-  const normalizedProgress = direction === 'reverse' ? 1 - localProgress : localProgress
-
-  let x = -999
-  let y = -999
-
-  if (isVisible && pathState) {
-    const point = getPointAlongPath(
-      pathState.path,
-      pathState.length,
-      normalizedProgress,
-      pathState.container,
-    )
-
-    if (point) {
-      x = point.x - size / 2
-      y = point.y - size / 2
-    }
-  }
-
-  return (
-    <motion.div
-      className="pointer-events-none absolute left-0 top-0 z-30 rounded-full"
-      animate={{
-        x,
-        y,
-        opacity: isVisible ? 1 : 0,
-        scale: isVisible ? 1 : 0.45,
-      }}
-      transition={{
-        x: { duration: 0.06, ease: 'linear' },
-        y: { duration: 0.06, ease: 'linear' },
-        opacity: { duration: 0.12, ease: 'easeOut' },
-        scale: { duration: 0.12, ease: 'easeOut' },
-      }}
-      style={{
-        width: size,
-        height: size,
-        background: color,
-        boxShadow: `0 0 12px ${color}, 0 0 28px ${color}`,
-      }}
-    />
   )
 }
 
 export function Architecture() {
-  const { width } = useWindowSize()
-  const isMobile = width < 768
-  const flowShellRef = useRef<HTMLDivElement | null>(null)
-  const {
-    currentScenario,
-    elapsedMs,
-    progress,
-    isPaused,
-    jumpToScenario,
-    runKey,
-    scenarios,
-    togglePaused,
-  } = useAttackSimulation()
-
-  const layoutVersion = `${isMobile}-${width}`
-  const activeNodeIds = new Set(currentScenario.activeNodeIds)
-  const activeEdgeIds = new Set(currentScenario.highlightedEdgeIds)
-
-  const nodes: TopologyNode[] = topologyNodes.map((node) => {
-    if (node.type !== 'deviceNode') {
-      return node
-    }
-
-    const isFirewall = node.id === topologyNodeIds.firewall
-    const isSplunk = node.id === topologyNodeIds.splunk
-
-    return {
-      ...node,
-      data: {
-        ...node.data,
-        isActive: activeNodeIds.has(node.id),
-        flashAlert: isFirewall && currentScenario.firewallFlash,
-        flashKey: isFirewall && currentScenario.firewallFlash ? runKey : undefined,
-        rapidPulse: isSplunk && currentScenario.splunkRapidPulse,
-        showAlert: isSplunk && currentScenario.showAlertBadge,
-        alertKey: isSplunk && currentScenario.showAlertBadge ? runKey : undefined,
-      },
-    }
-  })
-
-  const edges: TopologyEdge[] = topologyEdges.map((edge) => {
-    const isHighlighted = activeEdgeIds.has(edge.id)
-    const accent = edge.data?.accent ?? '#94a3b8'
-    const baseWeight = edge.data?.lineWeight ?? 1.6
-    const nextStyle = {
-      ...edge.style,
-      stroke: accent,
-      strokeWidth: isHighlighted ? Math.max(baseWeight + 0.65, 2.2) : baseWeight,
-      opacity: isHighlighted ? 1 : 0.88,
-      filter: isHighlighted ? `drop-shadow(0 0 8px ${accent})` : 'none',
-    }
-
-    if (edge.data?.lineStyle === 'dashed') {
-      nextStyle.strokeDasharray = '8 6'
-    }
-
-    return {
-      ...edge,
-      animated: edge.animated || isHighlighted,
-      style: nextStyle,
-      labelStyle: {
-        ...edge.labelStyle,
-        fill: isHighlighted ? '#f8fafc' : accent,
-      },
-    }
-  })
-
   return (
     <section id="architecture" className="w-full bg-background px-6 py-24 md:px-10 lg:px-16">
-      <style>{`
-        @keyframes topology-firewall-breathe {
-          0%, 100% {
-            box-shadow:
-              inset 0 0 24px rgba(0, 255, 135, 0.16),
-              0 0 0 1px rgba(0, 255, 135, 0.32),
-              0 0 26px rgba(0, 255, 135, 0.18);
-          }
-          50% {
-            box-shadow:
-              inset 0 0 28px rgba(0, 255, 135, 0.24),
-              0 0 0 1px rgba(0, 255, 135, 0.46),
-              0 0 44px rgba(0, 255, 135, 0.34);
-          }
-        }
-
-        @keyframes topology-splunk-ingest {
-          0%, 100% {
-            box-shadow:
-              inset 0 0 24px rgba(0, 200, 255, 0.18),
-              0 0 22px rgba(0, 200, 255, 0.20);
-          }
-          50% {
-            box-shadow:
-              inset 0 0 30px rgba(0, 200, 255, 0.28),
-              0 0 40px rgba(0, 200, 255, 0.40);
-          }
-        }
-
-        .topology-firewall-shell {
-          animation: topology-firewall-breathe 2.4s ease-in-out infinite;
-        }
-
-        .topology-node-splunk-pulse {
-          animation: topology-splunk-ingest 0.9s ease-in-out infinite;
-        }
-      `}</style>
-
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-12">
           <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
-            Live attack simulation across segmented zones
+            Segmented network map with monitored traffic flow
           </p>
           <h2 className="mt-3 font-heading text-[56px] font-black uppercase leading-[0.88] tracking-[-0.03em] text-white md:text-[96px]">
             NETWORK
@@ -482,119 +172,142 @@ export function Architecture() {
             TOPOLOGY
           </h2>
           <p className="mt-4 max-w-2xl text-sm text-slate-300 md:text-base">
-            Live attack simulation across segmented zones
+            A clean 2D view of the homelab showing the trust boundary, segmented zones, and the
+            main monitored traffic paths.
           </p>
         </div>
 
-        <div className="relative mt-10">
+        <div className="relative">
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-[-30px] rounded-[32px] bg-[radial-gradient(circle_at_50%_40%,rgba(0,255,135,0.08),transparent_64%)]"
+            className="pointer-events-none absolute inset-[-24px] rounded-[34px] bg-[radial-gradient(circle_at_50%_30%,rgba(0,255,135,0.08),transparent_58%)]"
           />
 
-          <div
-            ref={flowShellRef}
-            className="relative h-[450px] overflow-hidden rounded-[28px] border border-[rgba(0,255,135,0.15)] bg-[rgba(8,8,15,0.94)] md:h-[700px]"
-          >
-            <ReactFlow
-              nodes={nodes}
-              edges={edges}
-              nodeTypes={nodeTypes}
-              fitView
-              fitViewOptions={{ padding: isMobile ? 0.2 : 0.14 }}
-              nodesDraggable={false}
-              nodesConnectable={false}
-              nodesFocusable={false}
-              edgesFocusable={false}
-              elementsSelectable={false}
-              panOnDrag={!isMobile}
-              zoomOnScroll={!isMobile}
-              zoomOnPinch={!isMobile}
-              zoomOnDoubleClick={!isMobile}
-              preventScrolling={false}
-              minZoom={0.72}
-              maxZoom={1.15}
-              proOptions={{ hideAttribution: true }}
-            >
-              <Background variant={BackgroundVariant.Dots} gap={24} size={1.2} color="#1a1a2e" />
-            </ReactFlow>
+          <div className="overflow-x-auto pb-2">
+            <div className="min-w-[920px]">
+              <div className="relative aspect-[1000/640] overflow-hidden rounded-[28px] border border-accent/15 bg-[linear-gradient(180deg,rgba(9,9,16,0.98),rgba(17,17,24,0.94))] shadow-[0_28px_80px_rgba(0,0,0,0.38)]">
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_18%,rgba(0,255,135,0.06),transparent_38%),linear-gradient(rgba(255,255,255,0.018)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.018)_1px,transparent_1px)] bg-[size:auto,32px_32px,32px_32px]" />
 
-            <div className="pointer-events-none absolute inset-0 z-20">
-              {currentScenario.pulseStreams.flatMap((stream) =>
-                Array.from({ length: stream.count }, (_, pulseIndex) => (
-                  <EdgePulse
-                    key={`${stream.edgeId}-${pulseIndex}-${runKey}`}
-                    containerRef={flowShellRef}
-                    edgeId={stream.edgeId}
-                    color={stream.color}
-                    elapsedMs={elapsedMs}
-                    delayMs={pulseIndex * stream.staggerMs}
-                    travelMs={stream.travelMs}
-                    direction={stream.direction}
-                    layoutVersion={layoutVersion}
-                    runKey={runKey}
-                  />
-                )),
-              )}
-            </div>
+                {topologyZones.map((zone) => (
+                  <div
+                    key={zone.id}
+                    className="absolute rounded-[24px] border border-dashed backdrop-blur-[2px]"
+                    style={{
+                      left: percent(zone.x, topologyViewBox.width),
+                      top: percent(zone.y, topologyViewBox.height),
+                      width: percent(zone.width, topologyViewBox.width),
+                      height: percent(zone.height, topologyViewBox.height),
+                      borderColor: `${zone.accent}44`,
+                      background: `linear-gradient(180deg, ${zone.accent}10, rgba(17,17,24,0.22))`,
+                      boxShadow: `inset 0 0 22px ${zone.accent}10`,
+                    }}
+                  >
+                    <div className="absolute left-5 top-5 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-slate-200">
+                      {zone.label}
+                    </div>
+                  </div>
+                ))}
 
-            <div className="pointer-events-none absolute inset-x-0 bottom-4 z-30 flex justify-center px-4">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={`${currentScenario.id}-${runKey}`}
-                  className="rounded-full border border-accent/45 bg-[rgba(9,9,17,0.92)] px-5 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.24em] text-accent"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: [0, 1, 1, 0], y: [10, 0, 0, -4] }}
-                  exit={{ opacity: 0, y: -4 }}
-                  transition={{ duration: 2.1, ease: 'easeOut' }}
+                <svg
+                  viewBox={`0 0 ${topologyViewBox.width} ${topologyViewBox.height}`}
+                  className="absolute inset-0 h-full w-full"
+                  aria-hidden="true"
                 >
-                  {currentScenario.bannerLabel}
-                </motion.div>
-              </AnimatePresence>
+                  <defs>
+                    <marker
+                      id="arrow-head-accent"
+                      viewBox="0 0 10 10"
+                      refX="8.2"
+                      refY="5"
+                      markerWidth="7"
+                      markerHeight="7"
+                      orient="auto-start-reverse"
+                    >
+                      <path d="M 0 0 L 10 5 L 0 10 z" fill="currentColor" />
+                    </marker>
+                  </defs>
+
+                  {topologyArrows.map((arrow) => (
+                    <g key={arrow.id} style={{ color: arrow.accent }}>
+                      <path
+                        d={arrow.path}
+                        fill="none"
+                        stroke={arrow.accent}
+                        strokeWidth={arrow.dashed ? 2.2 : 2.4}
+                        strokeDasharray={arrow.dashed ? '10 8' : undefined}
+                        strokeLinecap="round"
+                        markerEnd="url(#arrow-head-accent)"
+                        opacity={arrow.subtle ? 0.68 : 0.95}
+                        style={{
+                          filter: `drop-shadow(0 0 8px ${arrow.accent}55)`,
+                        }}
+                      />
+                    </g>
+                  ))}
+                </svg>
+
+                <div className="absolute inset-0">
+                  {topologyNodes.map((node) => (
+                    <NodeCard key={node.id} node={node} />
+                  ))}
+                </div>
+
+                <div className="pointer-events-none absolute inset-0">
+                  <span className="absolute left-[46%] top-[15%] rounded-full border border-white/15 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-slate-100">
+                    WAN
+                  </span>
+                  <span className="absolute left-[26%] top-[53%] rounded-full border border-[#f59e0b]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
+                    LAN
+                  </span>
+                  <span className="absolute left-[45%] top-[56%] rounded-full border border-[#ff3c3c]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff3c3c]">
+                    SERVER NET
+                  </span>
+                  <span className="absolute left-[58%] top-[47%] rounded-full border border-[#00c8ff]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
+                    SYSLOG
+                  </span>
+                  <span className="absolute left-[69%] top-[56%] rounded-full border border-[#6366f1]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#6366f1]">
+                    WORKSTATION NET
+                  </span>
+                  <span className="absolute left-[30%] top-[72%] rounded-full border border-[#f59e0b]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
+                    ATTACK PATH
+                  </span>
+                  <span className="absolute left-[56%] top-[73%] rounded-full border border-[#00c8ff]/35 bg-background/90 px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
+                    TELEMETRY
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-white/8 bg-surface/65 px-4 py-4 md:flex-row md:items-center md:justify-between md:px-5">
-            <div className="flex flex-wrap gap-2">
-              {scenarios.map((scenario) => {
-                const isActive = currentScenario.id === scenario.id
-
-                return (
-                  <button
-                    key={scenario.id}
-                    type="button"
-                    onClick={() => jumpToScenario(scenario.id)}
-                    aria-pressed={isActive}
-                    className={`rounded-full border px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] transition ${
-                      isActive
-                        ? 'border-accent bg-accent text-background shadow-[0_0_24px_rgba(0,255,135,0.28)]'
-                        : 'border-white/10 text-slate-300 hover:border-accent/55 hover:text-accent'
-                    }`}
-                  >
-                    {scenario.buttonLabel}
-                  </button>
-                )
-              })}
+          <div className="mt-6 grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="rounded-2xl border border-accent/12 bg-surface/60 p-4">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent">
+                Security Boundary
+              </p>
+              <p className="mt-2 text-sm text-slate-300">
+                `pfSense` sits at the center of the lab and controls routing, segmentation, and
+                monitored traffic flow.
+              </p>
             </div>
 
-            <div className="flex flex-1 items-center gap-4 md:max-w-md">
-              <div className="relative h-[3px] flex-1 overflow-hidden rounded-full bg-white/10">
-                <motion.div
-                  className="absolute inset-y-0 left-0 origin-left rounded-full bg-accent"
-                  animate={{ scaleX: progress }}
-                  transition={{ duration: 0.08, ease: 'linear' }}
-                  style={{ width: '100%' }}
-                />
-              </div>
+            <div className="rounded-2xl border border-accent2/12 bg-surface/60 p-4">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-accent2">
+                Detection Path
+              </p>
+              <p className="mt-2 text-sm text-slate-300">
+                Logs and telemetry move toward `Splunk SIEM`, which acts as the central monitoring
+                point for the lab.
+              </p>
+            </div>
 
-              <button
-                type="button"
-                onClick={togglePaused}
-                aria-label={isPaused ? 'Resume attack simulation' : 'Pause attack simulation'}
-                className="rounded-full border border-white/10 px-4 py-2 font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-slate-200 transition hover:border-accent/55 hover:text-accent"
-              >
-                {isPaused ? 'Resume' : 'Pause'}
-              </button>
+            <div className="rounded-2xl border border-danger/12 bg-surface/60 p-4">
+              <p className="font-mono text-[11px] font-bold uppercase tracking-[0.22em] text-danger">
+                Segmented Zones
+              </p>
+              <p className="mt-2 text-sm text-slate-300">
+                Attacker, target, monitoring, and workstation systems are visually separated into
+                distinct zones to make the architecture easier to read.
+              </p>
             </div>
           </div>
         </div>
