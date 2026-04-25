@@ -27,11 +27,11 @@ function NumericStatCard({ target, label, tone }: NumericStatCardProps) {
 
 export function StatsBar() {
   return (
-    <section id="stats" className="w-full bg-background px-6 py-10 md:px-10 lg:px-16">
+    <section id="stats" className="w-full bg-transparent px-6 py-10 md:px-10 lg:px-16">
       <div className="mx-auto grid w-full max-w-7xl gap-4 md:grid-cols-4">
-        <NumericStatCard target={3} label="Networks Segmented" tone="#d6ff45" />
-        <NumericStatCard target={8} label="Offensive Tools" tone="#7ed7ff" />
-        <NumericStatCard target={1} label="Central SIEM" tone="#ff7bd5" />
+        <NumericStatCard target={3} label="Networks Segmented" tone="#d9b3ee" />
+        <NumericStatCard target={8} label="Offensive Tools" tone="#b85fd8" />
+        <NumericStatCard target={1} label="Central SIEM" tone="#c000ba" />
 
         <motion.article
           className="neo-card relative overflow-hidden bg-accent px-6 py-8"

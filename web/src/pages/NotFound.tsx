@@ -4,7 +4,7 @@ export function NotFound() {
   const navigate = useNavigate()
 
   return (
-    <section className="flex min-h-screen items-center bg-background px-6 py-20 md:px-10 lg:px-16">
+    <section className="flex min-h-screen items-center bg-transparent px-6 py-20 md:px-10 lg:px-16">
       <div className="neo-panel mx-auto w-full max-w-3xl bg-pink p-8 md:p-10">
         <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">Route Exception</p>
         <h1 className="mt-3 font-heading text-4xl font-black uppercase tracking-[-0.03em] text-ink md:text-6xl">
@@ -22,7 +22,7 @@ export function NotFound() {
 
         <button
           type="button"
-          className="neo-button mt-8 inline-flex items-center justify-center bg-accent px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-ink"
+          className="neo-button mt-8 inline-flex items-center justify-center bg-accent px-6 py-3 text-sm font-semibold uppercase tracking-[0.14em] text-paper"
           onClick={() => navigate('/')}
         >
           Return Home

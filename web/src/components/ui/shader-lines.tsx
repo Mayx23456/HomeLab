@@ -10,8 +10,8 @@ type ShaderAnimationProps = React.ComponentProps<'div'> & {
 }
 
 export function ShaderAnimation({
-  primary = '#00ff87',
-  secondary = '#00c8ff',
+  primary = '#c000ba',
+  secondary = '#f4ddff',
   className,
   ...props
 }: ShaderAnimationProps) {

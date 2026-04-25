@@ -5,8 +5,8 @@ import { sectionConfigs } from '../data/sections'
 export function LayoutShell({ children }: PropsWithChildren) {
   return (
     <>
-      <div className="min-h-screen bg-background text-ink">
-        <header className="sticky top-0 z-20 bg-background/95 py-4 backdrop-blur">
+      <div className="min-h-screen bg-transparent text-ink">
+        <header className="sticky top-0 z-20 bg-black/10 py-4 backdrop-blur">
           <div className="neo-card mx-auto flex w-full max-w-6xl items-center justify-between bg-yellow px-6 py-4 md:px-10">
             <p className="text-sm font-medium uppercase tracking-[0.16em] text-accent">
               Web Shell

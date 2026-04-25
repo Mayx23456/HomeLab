@@ -12,9 +12,9 @@ const fieldPattern = /^(host|source|sourcetype)(\s*[:=]\s*)(.+)$/i
 function TerminalWindowDots() {
   return (
     <div className="flex items-center gap-2" aria-hidden="true">
-      <span className="h-3 w-3 rounded-full bg-[#ff5f56]" />
-      <span className="h-3 w-3 rounded-full bg-[#ffbd2e]" />
-      <span className="h-3 w-3 rounded-full bg-[#27c93f]" />
+      <span className="h-3 w-3 rounded-full bg-[#43085f]" />
+      <span className="h-3 w-3 rounded-full bg-[#77008a]" />
+      <span className="h-3 w-3 rounded-full bg-[#c000ba]" />
     </div>
   )
 }
@@ -29,7 +29,7 @@ function renderCellContent(value: string, isAlert: boolean) {
   if (fieldMatch) {
     return (
       <>
-        <span className="text-[#a855f7]">{fieldMatch[1]}{fieldMatch[2]}</span>
+        <span className="text-[#d9b3ee]">{fieldMatch[1]}{fieldMatch[2]}</span>
         <span className="text-accent2">{fieldMatch[3]}</span>
       </>
     )
@@ -91,10 +91,10 @@ function OutputRow({
               <span className="w-16 shrink-0 text-right text-white">{cell}</span>
               <div className="h-[6px] flex-1 rounded-full bg-white/6">
                 <div
-                  className="h-full rounded-full bg-accent2"
+                  className="h-full rounded-full bg-pink"
                   style={{
                     width,
-                    boxShadow: '0 0 12px rgba(0, 200, 255, 0.32)',
+                    boxShadow: '0 0 12px rgba(192, 0, 186, 0.32)',
                   }}
                 />
               </div>
@@ -233,7 +233,7 @@ export function Terminal() {
   const displayQuery = stage === 'query' ? queryTyped : stage === 'description' ? '' : activeBlock.query
 
   return (
-    <section id="monitoring" className="w-full bg-background px-6 py-24 md:px-10 lg:px-16">
+    <section id="monitoring" className="w-full bg-transparent px-6 py-24 md:px-10 lg:px-16">
       <style>{`
         @keyframes terminal-cursor-blink {
           0%, 49% { opacity: 1; }
@@ -285,8 +285,8 @@ export function Terminal() {
             </p>
 
             <div className="flex items-center gap-2">
-              <span className="terminal-live-dot h-2.5 w-2.5 rounded-full bg-accent" />
-              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-accent">
+              <span className="terminal-live-dot h-2.5 w-2.5 rounded-full bg-pink" />
+              <span className="font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-pink">
                 LIVE
               </span>
             </div>
@@ -296,7 +296,7 @@ export function Terminal() {
             <div className="neo-card min-h-[31rem] space-y-3 overflow-hidden bg-ink px-4 py-5 font-mono text-paper md:px-5 md:py-6">
               {showDivider && (
                 <>
-                  <p className="text-[13px] text-[#1a1a2e]">{dividerLine}</p>
+                  <p className="text-[13px] text-[#3b0d4e]">{dividerLine}</p>
                   <div className="h-2" />
                 </>
               )}
@@ -307,7 +307,7 @@ export function Terminal() {
               </p>
 
               <div className="flex items-start gap-3 text-[13px] md:text-sm">
-                <span className="pt-[1px] text-accent">❯</span>
+                <span className="pt-[1px] text-pink">❯</span>
                 <p className="min-h-[1.5rem] whitespace-pre-wrap break-words text-white">
                   {displayQuery}
                   {stage === 'query' && <span className="terminal-cursor ml-1 inline-block text-white">▋</span>}
@@ -343,9 +343,9 @@ export function Terminal() {
                   key={block.id}
                   className="h-2.5 w-2.5 rounded-full"
                   style={{
-                    backgroundColor: blockIndex === index ? '#00ff87' : '#3a3a4a',
+                    backgroundColor: blockIndex === index ? '#c000ba' : '#43085f',
                     boxShadow:
-                      blockIndex === index ? '0 0 10px rgba(0,255,135,0.38)' : 'none',
+                      blockIndex === index ? '0 0 10px rgba(192,0,186,0.38)' : 'none',
                   }}
                 />
               ))}

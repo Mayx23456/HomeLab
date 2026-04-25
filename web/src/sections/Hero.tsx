@@ -44,7 +44,7 @@ export function Hero() {
   return (
     <section
       id="overview"
-      className="relative flex min-h-screen w-full items-center overflow-hidden bg-background"
+      className="relative flex min-h-screen w-full items-center overflow-hidden bg-transparent"
     >
       <div className="pointer-events-none absolute inset-0" aria-hidden="true">
         <div className="absolute left-[6%] top-[14%] h-36 w-36 rounded-[2rem] border-[4px] border-ink bg-pink" />
@@ -82,7 +82,7 @@ export function Hero() {
               </motion.span>
               <motion.span
                 variants={headingWord}
-                className="rounded-[1.4rem] bg-accent px-3 py-1 text-[56px] font-black text-ink md:text-[104px]"
+                className="rounded-[1.4rem] bg-accent px-3 py-1 text-[56px] font-black text-paper md:text-[104px]"
               >
                 TEAM
               </motion.span>
@@ -119,10 +119,10 @@ export function Hero() {
                 initial={{ opacity: 0, y: 18 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.45, ease: 'easeOut' }}
-                className="neo-card px-4 py-4"
-                style={{
-                  backgroundColor: ['#fff1a8', '#7ed7ff', '#ff7bd5'][index],
-                }}
+                  className="neo-card px-4 py-4"
+                  style={{
+                  backgroundColor: ['#d9b3ee', '#b85fd8', '#c000ba'][index],
+                  }}
               >
                 <p className="terminal text-[11px] uppercase tracking-[0.24em] text-ink/70">
                   {item.label}
@@ -136,7 +136,7 @@ export function Hero() {
             <a
               href="#architecture"
               aria-label="Explore Architecture"
-              className="neo-button inline-flex items-center justify-center bg-accent px-8 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-ink"
+              className="neo-button inline-flex items-center justify-center bg-accent px-8 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-paper"
             >
               Explore Architecture
             </a>
@@ -166,11 +166,11 @@ export function Hero() {
           <div className="neo-panel relative aspect-[0.92] overflow-hidden bg-yellow p-4">
             <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.08),transparent_35%),repeating-linear-gradient(90deg,transparent_0_28px,rgba(17,17,17,0.06)_28px_29px)]" />
 
-            <div className="neo-card relative h-full overflow-hidden bg-[#fff3b6]">
+            <div className="neo-card relative h-full overflow-hidden bg-paper">
               <div className="absolute inset-0 opacity-90">
                 <FallingPattern
                   color="rgba(17, 17, 17, 0.92)"
-                  backgroundColor="#fff3b6"
+                  backgroundColor="#f4ddff"
                   duration={180}
                   blurIntensity="0.5em"
                   density={0.95}
@@ -179,7 +179,7 @@ export function Hero() {
               </div>
 
               <div className="neo-card absolute inset-[10%] overflow-hidden bg-accent2">
-                <ShaderAnimation primary="#ffd84d" secondary="#ffffff" />
+                <ShaderAnimation primary="#c000ba" secondary="#f4ddff" />
                 <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(255,255,255,0.14),transparent_28%),linear-gradient(180deg,transparent_0%,transparent_65%,rgba(0,0,0,0.18)_100%)]" />
 
                 <div className="absolute left-5 right-5 top-5 flex items-start justify-between gap-4">

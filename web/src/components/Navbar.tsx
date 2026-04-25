@@ -82,7 +82,7 @@ export function Navbar() {
       `}</style>
 
       <motion.header
-        className="fixed inset-x-0 top-0 z-50 bg-background/95 backdrop-blur-sm"
+        className="fixed inset-x-0 top-0 z-50 bg-black/10 backdrop-blur-sm"
         style={{
           paddingTop: yPadding,
           paddingBottom: yPadding,
@@ -111,7 +111,7 @@ export function Navbar() {
                       aria-label={`Navigate to ${item.label} section`}
                       className={`neo-pill px-4 py-2 text-sm font-semibold transition-colors ${
                         isActive
-                          ? 'bg-accent text-ink'
+                          ? 'bg-accent text-paper'
                           : 'bg-paper text-ink hover:bg-sky focus-visible:bg-sky'
                       }`}
                     >
@@ -175,7 +175,7 @@ export function Navbar() {
                 <button
                   type="button"
                   aria-label="Close navigation menu"
-                  className="neo-button bg-accent px-3 py-2 text-xs uppercase tracking-[0.12em] text-ink"
+                  className="neo-button bg-accent px-3 py-2 text-xs uppercase tracking-[0.12em] text-paper"
                   onClick={closeDrawer}
                 >
                   Close
@@ -194,7 +194,7 @@ export function Navbar() {
                           aria-label={`Navigate to ${item.label} section`}
                           className={`neo-card block px-4 py-3 text-base ${
                             isActive
-                              ? 'bg-accent text-ink'
+                              ? 'bg-accent text-paper'
                               : 'bg-paper text-ink hover:bg-sky focus-visible:bg-sky'
                           }`}
                           onClick={closeDrawer}

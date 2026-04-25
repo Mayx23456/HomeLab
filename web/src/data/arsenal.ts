@@ -25,7 +25,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'nmap',
     name: 'Nmap',
     category: 'Reconnaissance',
-    categoryColour: '#f59e0b',
+    categoryColour: '#77008a',
     icon: 'radar',
     what: 'Network mapper used to discover open ports, running services, and live hosts across lab segments',
     how: [
@@ -45,7 +45,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'openvas',
     name: 'OpenVAS',
     category: 'Vulnerability Scanning',
-    categoryColour: '#a855f7',
+    categoryColour: '#8b009d',
     icon: 'shield-search',
     what: 'Vulnerability scanner used to run authenticated and unauthenticated scans against lab systems',
     how: [
@@ -66,7 +66,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'metasploit',
     name: 'Metasploit',
     category: 'Exploitation',
-    categoryColour: '#ff3c3c',
+    categoryColour: '#c000ba',
     icon: 'burst',
     what: 'Exploitation framework used to execute controlled attacks against intentionally vulnerable hosts',
     how: [
@@ -93,7 +93,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'hydra',
     name: 'Hydra',
     category: 'Credential Testing',
-    categoryColour: '#f59e0b',
+    categoryColour: '#9000a4',
     icon: 'keys',
     what: 'Credential testing tool supporting SSH, FTP, SMB, RDP, HTTP and more - used to test login systems for weak credentials',
     how: [
@@ -120,7 +120,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'burp-suite',
     name: 'Burp Suite',
     category: 'Web Testing',
-    categoryColour: '#f97316',
+    categoryColour: '#a000ad',
     icon: 'globe',
     what: 'Web proxy used to intercept, replay, fuzz and analyse HTTP traffic against web applications on Metasploitable 2',
     how: [
@@ -142,7 +142,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'wireshark',
     name: 'Wireshark',
     category: 'Traffic Analysis',
-    categoryColour: '#00c8ff',
+    categoryColour: '#b85fd8',
     icon: 'waves',
     what: 'Packet analyser used to capture and inspect raw network traffic across all lab protocols',
     how: [
@@ -164,7 +164,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'john-the-ripper',
     name: 'John the Ripper',
     category: 'Password Cracking',
-    categoryColour: '#ec4899',
+    categoryColour: '#c000ba',
     icon: 'hash',
     what: 'Offline password cracking tool used to test hash vulnerabilities and understand why weak passwords fail',
     how: [
@@ -184,7 +184,7 @@ export const arsenalTools: ArsenalTool[] = [
     id: 'scapy',
     name: 'Scapy',
     category: 'Packet Crafting',
-    categoryColour: '#00ff87',
+    categoryColour: '#d9b3ee',
     icon: 'packet',
     what: 'Python packet crafting tool used to build custom ARP-based host discovery scripts',
     how: [

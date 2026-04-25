@@ -46,7 +46,7 @@ const workflowSteps: WorkflowStep[] = [
   },
 ]
 
-const workflowStepBackgrounds = ['#d6ff45', '#7ed7ff', '#ffd84d', '#ff7bd5', '#ffb089'] as const
+const workflowStepBackgrounds = ['#d9b3ee', '#b85fd8', '#d14fe5', '#c000ba', '#f4ddff'] as const
 
 export function DetectionWorkflow() {
   const sectionRef = useRef<HTMLElement | null>(null)
@@ -60,7 +60,7 @@ export function DetectionWorkflow() {
     <section
       id="detection"
       ref={sectionRef}
-      className="w-full bg-background px-6 py-24 md:px-10 lg:px-16"
+      className="w-full bg-transparent px-6 py-24 md:px-10 lg:px-16"
     >
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-12">
@@ -83,10 +83,10 @@ export function DetectionWorkflow() {
               preserveAspectRatio="none"
               aria-hidden="true"
             >
-              <line x1="1" y1="0" x2="1" y2="1000" stroke="#111111" strokeWidth="4" />
+              <line x1="1" y1="0" x2="1" y2="1000" stroke="#43085f" strokeWidth="4" />
               <motion.path
                 d="M 1 0 V 1000"
-                stroke="#2155ff"
+                stroke="#a000ad"
                 strokeWidth="4"
                 style={{ pathLength: linePathLength }}
                 strokeLinecap="round"

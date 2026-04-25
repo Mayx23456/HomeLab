@@ -109,7 +109,7 @@ function NodeCard({ node }: { node: TopologyNode }) {
         top: percent(node.y, topologyViewBox.height),
         width: percent(node.width, topologyViewBox.width),
         minHeight: percent(node.height, topologyViewBox.height),
-        backgroundColor: node.large ? '#d6ff45' : '#fffdf5',
+        backgroundColor: node.large ? '#b85fd8' : '#f4ddff',
         outline: node.large ? `4px solid ${node.accent}` : undefined,
       }}
     >
@@ -135,7 +135,7 @@ function NodeCard({ node }: { node: TopologyNode }) {
             className="neo-pill mt-3 inline-flex px-2.5 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
             style={{
               color: node.accent,
-              backgroundColor: '#fffdf5',
+              backgroundColor: '#f4ddff',
             }}
           >
             {node.badge}
@@ -148,7 +148,7 @@ function NodeCard({ node }: { node: TopologyNode }) {
 
 export function Architecture() {
   return (
-    <section id="architecture" className="w-full bg-background px-6 py-24 md:px-10 lg:px-16">
+    <section id="architecture" className="w-full bg-transparent px-6 py-24 md:px-10 lg:px-16">
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-12">
           <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
@@ -234,25 +234,25 @@ export function Architecture() {
                 </div>
 
                 <div className="pointer-events-none absolute inset-0">
-                  <span className="neo-pill absolute left-[46%] top-[15%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink">
+                  <span className="neo-pill absolute left-[46%] top-[15%] bg-paper px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-ink">
                     WAN
                   </span>
-                  <span className="neo-pill absolute left-[26%] top-[53%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
+                  <span className="neo-pill absolute left-[26%] top-[53%] bg-paper px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#77008a]">
                     LAN
                   </span>
-                  <span className="neo-pill absolute left-[45%] top-[56%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#ff3c3c]">
+                  <span className="neo-pill absolute left-[45%] top-[56%] bg-paper px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#a000ad]">
                     SERVER NET
                   </span>
-                  <span className="neo-pill absolute left-[58%] top-[47%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
+                  <span className="neo-pill absolute left-[58%] top-[47%] bg-paper px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#c000ba]">
                     SYSLOG
                   </span>
-                  <span className="neo-pill absolute left-[69%] top-[56%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#6366f1]">
+                  <span className="neo-pill absolute left-[69%] top-[56%] bg-paper px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#b85fd8]">
                     WORKSTATION NET
                   </span>
-                  <span className="neo-pill absolute left-[30%] top-[72%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#f59e0b]">
+                  <span className="neo-pill absolute left-[30%] top-[72%] bg-paper px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#77008a]">
                     ATTACK PATH
                   </span>
-                  <span className="neo-pill absolute left-[56%] top-[73%] bg-white px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#00c8ff]">
+                  <span className="neo-pill absolute left-[56%] top-[73%] bg-paper px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em] text-[#c000ba]">
                     TELEMETRY
                   </span>
                 </div>

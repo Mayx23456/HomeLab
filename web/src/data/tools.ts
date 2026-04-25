@@ -16,7 +16,7 @@ export const tools: Tool[] = [
     category: 'Reconnaissance',
     description: 'Network discovery and service fingerprinting for target visibility.',
     learnedText: 'Reliable scans need pacing, segmentation awareness, and clear scope boundaries.',
-    accentColour: '#00c8ff',
+    accentColour: '#b85fd8',
   },
   {
     id: 'openvas',
@@ -24,7 +24,7 @@ export const tools: Tool[] = [
     category: 'Reconnaissance',
     description: 'Vulnerability assessment engine for exposure baselining.',
     learnedText: 'Findings become useful only after triage, deduplication, and context mapping.',
-    accentColour: '#00c8ff',
+    accentColour: '#b85fd8',
   },
   {
     id: 'metasploit',
@@ -32,7 +32,7 @@ export const tools: Tool[] = [
     category: 'Exploitation',
     description: 'Controlled exploitation framework for validation of defensive controls.',
     learnedText: 'Exploit results are strongest when tied to compensating-control recommendations.',
-    accentColour: '#ff3c3c',
+    accentColour: '#c000ba',
   },
   {
     id: 'hydra',
@@ -40,7 +40,7 @@ export const tools: Tool[] = [
     category: 'Password Attacks',
     description: 'Credential brute-force testing across exposed authentication services.',
     learnedText: 'Account lockout, rate limiting, and alerting stop brute-force risk fast.',
-    accentColour: '#f59e0b',
+    accentColour: '#77008a',
   },
   {
     id: 'burp-suite',
@@ -48,7 +48,7 @@ export const tools: Tool[] = [
     category: 'Exploitation',
     description: 'Web application testing proxy for request analysis and attack simulation.',
     learnedText: 'Manual replay plus precise payload crafting outperforms blind automation.',
-    accentColour: '#ff3c3c',
+    accentColour: '#c000ba',
   },
   {
     id: 'wireshark',
@@ -56,7 +56,7 @@ export const tools: Tool[] = [
     category: 'Analysis',
     description: 'Packet-level inspection for protocol behavior and anomaly detection.',
     learnedText: 'Short, focused captures with filters surface signal without analyst fatigue.',
-    accentColour: '#00ff87',
+    accentColour: '#d9b3ee',
   },
   {
     id: 'john-the-ripper',
@@ -64,7 +64,7 @@ export const tools: Tool[] = [
     category: 'Password Attacks',
     description: 'Offline hash cracking for password strength validation.',
     learnedText: 'Password complexity must be paired with MFA and hash-hardening strategy.',
-    accentColour: '#f59e0b',
+    accentColour: '#77008a',
   },
   {
     id: 'scapy',
@@ -72,6 +72,6 @@ export const tools: Tool[] = [
     category: 'Reconnaissance',
     description: 'Packet crafting toolkit for custom discovery and protocol testing.',
     learnedText: 'Custom packets expose edge-case firewall and IDS behavior quickly.',
-    accentColour: '#00c8ff',
+    accentColour: '#b85fd8',
   },
 ]

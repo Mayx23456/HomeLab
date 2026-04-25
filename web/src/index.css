@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: light;
-  --background: #f7f1e1;
-  --primary: #ff5b2e;
-  --ink: #111111;
+  color-scheme: dark;
+  --background: #000000;
+  --primary: #a000ad;
+  --ink: #140019;
 }
 
 .dark {
@@ -30,22 +30,14 @@ body {
   font-family: 'Space Grotesk', system-ui, sans-serif;
   line-height: 1.5;
   background-color: var(--background);
-  background-image:
-    radial-gradient(circle at 1px 1px, rgba(17, 17, 17, 0.14) 1px, transparent 0),
-    radial-gradient(circle at top left, rgba(255, 91, 46, 0.12), transparent 24rem),
-    radial-gradient(circle at bottom right, rgba(33, 85, 255, 0.12), transparent 26rem);
-  background-size:
-    24px 24px,
-    auto,
-    auto;
   color: var(--ink);
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background: #2155ff;
-  color: #fffdf5;
+  background: #c000ba;
+  color: #f4ddff;
 }
 
 a {
@@ -54,7 +46,7 @@ a {
 }
 
 :focus-visible {
-  outline: 3px solid #2155ff;
+  outline: 3px solid #c000ba;
   outline-offset: 3px;
 }
 

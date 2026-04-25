@@ -6,7 +6,7 @@ type ArsenalView = 'grid' | 'detail'
 type ArsenalTab = 'HOW' | 'WHAT I DID' | 'ACHIEVED'
 
 const categoryFilters = ['ALL', ...new Set(arsenalTools.map((tool) => tool.category))]
-const brutalCardBackgrounds = ['#fff1a8', '#7ed7ff', '#ff7bd5', '#d6ff45'] as const
+const brutalCardBackgrounds = ['#d9b3ee', '#b85fd8', '#d14fe5', '#f4ddff'] as const
 
 function RadarIcon({ color }: { color: string }) {
   return (
@@ -124,7 +124,7 @@ function OpenArrowIcon() {
 
 function CheckIcon() {
   return (
-    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="#00ff87" strokeWidth="2">
+    <svg viewBox="0 0 20 20" className="h-4 w-4" fill="none" stroke="#c000ba" strokeWidth="2">
       <path d="m4.5 10.5 3.2 3.2 7.8-7.9" />
     </svg>
   )
@@ -160,7 +160,7 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
             <span
               className="neo-pill mt-3 inline-flex px-3 py-1 font-mono text-[10px] font-bold uppercase tracking-[0.18em]"
               style={{
-                backgroundColor: '#fffdf5',
+                backgroundColor: '#f4ddff',
                 color: tool.categoryColour,
               }}
             >
@@ -217,9 +217,9 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                   <div className="neo-card overflow-hidden bg-ink">
                     <div className="flex items-center justify-between border-b-[3px] border-paper/20 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#ff5f56]" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#ffbd2e]" />
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#27c93f]" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#43085f]" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#77008a]" />
+                        <span className="h-2.5 w-2.5 rounded-full bg-[#c000ba]" />
                       </div>
                       <span className="font-mono text-[11px] font-bold uppercase tracking-[0.18em] text-paper/70">
                         {tool.name}
@@ -289,7 +289,7 @@ function DetailPanel({ tool }: { tool: ArsenalTool }) {
                   <div
                     key={achievement}
                     className="neo-card flex items-start gap-3 bg-white px-4 py-4"
-                    style={{ borderLeft: '8px solid #d6ff45' }}
+                    style={{ borderLeft: '8px solid #c000ba' }}
                   >
                     <div className="mt-0.5">
                       <CheckIcon />
@@ -451,7 +451,7 @@ export function Arsenal() {
   }
 
   return (
-    <section id="arsenal" className="w-full bg-background px-6 py-24 md:px-10 lg:px-16">
+    <section id="arsenal" className="w-full bg-transparent px-6 py-24 md:px-10 lg:px-16">
       <div className="mx-auto w-full max-w-7xl">
         <div className="mb-12">
           <p className="terminal text-xs uppercase tracking-[0.18em] text-accent2">
@@ -581,7 +581,7 @@ export function Arsenal() {
                                 : 'text-ink/65 hover:text-ink'
                             }`}
                             style={{
-                              backgroundColor: isActive ? `${tool.categoryColour}55` : '#fffdf5',
+                              backgroundColor: isActive ? `${tool.categoryColour}55` : '#f4ddff',
                             }}
                           >
                             <span
